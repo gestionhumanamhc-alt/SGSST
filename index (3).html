@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#0ea5e9">
+<title>SG-SST · Inspecciones v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky:#0ea5e9;--sky-dark:#0284c7;--sky-pale:#e0f2fe;--sky-ultra:#f0f9ff;
+  --bg:#f0f9ff;--surface:#fff;--surface2:#f8fbff;
+  --border:#bae6fd;--border2:#7dd3fc;
+  --text:#0c1a2e;--text2:#334155;--text3:#64748b;--text4:#94a3b8;
+  --green:#059669;--green-bg:#ecfdf5;--green-b:#a7f3d0;
+  --yellow:#d97706;--yellow-bg:#fffbeb;--yellow-b:#fde68a;
+  --red:#dc2626;--red-bg:#fef2f2;--red-b:#fecaca;
+  --orange:#ea580c;
+  --radius:12px;--radius-sm:8px;--radius-xs:5px;
+  --shadow-sm:0 1px 3px rgba(14,165,233,.1);
+  --shadow:0 4px 16px rgba(14,165,233,.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;min-height:100vh;padding-bottom:80px;}
+/* ── HEADER ── */
+.header{position:sticky;top:0;z-index:100;background:var(--sky);color:white;padding:0 16px;height:60px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 12px rgba(14,165,233,.3);}
+.header-logo{font-size:17px;font-weight:800;letter-spacing:-.3px;}
+.header-logo span{opacity:.7;font-weight:500;}
+.header-badge{font-family:'JetBrains Mono',monospace;font-size:9px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);padding:3px 8px;border-radius:20px;letter-spacing:.5px;}
+.header-date{margin-left:auto;font-size:11px;color:rgba(255,255,255,.85);text-align:right;line-height:1.3;}
+/* ── BOTTOM NAV ── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--surface);border-top:1px solid var(--border);display:flex;box-shadow:0 -4px 20px rgba(14,165,233,.1);padding-bottom:env(safe-area-inset-bottom);}
+.bottom-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 2px 8px;gap:3px;cursor:pointer;color:var(--text4);font-size:9px;font-weight:700;letter-spacing:.3px;transition:all .2s;user-select:none;-webkit-user-select:none;position:relative;text-transform:uppercase;}
+.bottom-tab.active{color:var(--sky);}
+.bottom-tab.active::before{content:'';position:absolute;top:0;left:15%;right:15%;height:3px;background:var(--sky);border-radius:0 0 3px 3px;}
+.bottom-tab-icon{font-size:18px;line-height:1;}
+/* ── LAYOUT ── */
+.main{padding:16px;max-width:920px;margin:0 auto;}
+.section{display:none;animation:fadeIn .25s ease;}
+.section.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.page-title{font-size:22px;font-weight:800;margin-bottom:2px;letter-spacing:-.4px;}
+.page-sub{font-size:12px;color:var(--text3);margin-bottom:20px;}
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm);margin-bottom:16px;}
+.card-title{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+/* ── KPIs ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+@media(min-width:600px){.kpi-grid{grid-template-columns:repeat(6,1fr);}}
+.kpi-card{background:var(--surface);border-radius:var(--radius-sm);padding:14px 10px;text-align:center;border:1px solid var(--border);box-shadow:var(--shadow-sm);position:relative;overflow:hidden;}
+.kpi-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;}
+.kpi-sky::after{background:var(--sky)}.kpi-green::after{background:var(--green)}.kpi-yellow::after{background:var(--yellow)}.kpi-red::after{background:var(--red)}.kpi-orange::after{background:var(--orange)}
+.kpi-val{font-size:26px;font-weight:800;line-height:1;margin-bottom:3px;}
+.kpi-sky .kpi-val{color:var(--sky-dark)}.kpi-green .kpi-val{color:var(--green)}.kpi-yellow .kpi-val{color:var(--yellow)}.kpi-red .kpi-val{color:var(--red)}.kpi-orange .kpi-val{color:var(--orange)}
+.kpi-lbl{font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;}
+/* ── CHARTS ── */
+.charts-grid{display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:16px;}
+@media(min-width:700px){.charts-grid{grid-template-columns:1fr 1fr;}}
+.bar-chart{display:flex;flex-direction:column;gap:8px;}
+.bar-row{display:flex;align-items:center;gap:10px;}
+.bar-label{font-size:11px;color:var(--text2);width:130px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;}
+.bar-track{flex:1;background:var(--sky-pale);border-radius:3px;height:8px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:3px;transition:width 1s cubic-bezier(.16,1,.3,1);}
+.bar-val{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);width:24px;text-align:right;}
+.donut-wrap{display:flex;align-items:center;gap:20px;}
+.donut-container{position:relative;width:120px;height:120px;flex-shrink:0;}
+.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.donut-pct{font-size:22px;font-weight:800;color:var(--sky-dark);}
+.donut-lbl2{font-size:9px;color:var(--text3);font-family:'JetBrains Mono',monospace;letter-spacing:.5px;text-transform:uppercase;}
+.donut-legend{flex:1;display:flex;flex-direction:column;gap:8px;}
+.legend-item{display:flex;align-items:center;gap:8px;}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.legend-text{font-size:12px;color:var(--text2);font-weight:500;}
+.legend-count{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--text);}
+.ind-table{width:100%;border-collapse:collapse;}
+.ind-table td{padding:9px 6px;border-bottom:1px solid var(--sky-pale);font-size:12px;}
+.ind-name{color:var(--text2);font-weight:500;}
+.ind-meta{font-family:'JetBrains Mono',monospace;color:var(--text3);text-align:center;width:60px;}
+.ind-res{font-family:'JetBrains Mono',monospace;color:var(--sky-dark);font-weight:600;text-align:center;width:60px;}
+/* ── PROGRESS STRIP ── */
+.progress-strip{position:sticky;top:60px;z-index:90;background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(14,165,233,.08);}
+.progress-track{flex:1;height:8px;background:var(--sky-pale);border-radius:4px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--sky),var(--sky-dark));border-radius:4px;transition:width .4s;}
+.progress-pct{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--sky-dark);white-space:nowrap;min-width:40px;text-align:right;}
+.pbadge{padding:2px 7px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;}
+.pbadge-no{background:var(--red-bg);color:var(--red);border:1px solid var(--red-b);}
+.pbadge-parc{background:var(--yellow-bg);color:var(--yellow);border:1px solid var(--yellow-b);}
+/* ── INSPECTION FORM ── */
+.cat-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:linear-gradient(135deg,var(--sky),var(--sky-dark));color:white;border-radius:var(--radius-sm);margin-bottom:10px;font-size:13px;font-weight:700;cursor:pointer;user-select:none;-webkit-user-select:none;}
+.cat-score{margin-left:auto;background:rgba(255,255,255,.25);padding:3px 10px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-size:11px;}
+.cat-toggle{font-size:12px;transition:transform .25s;}
+.cat-toggle.open{transform:rotate(90deg);}
+.sub-header{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--sky-dark);padding:8px 14px 4px;background:var(--sky-pale);border-left:3px solid var(--sky);}
+.insp-item{display:flex;flex-direction:column;gap:8px;padding:14px;border-bottom:1px solid var(--sky-pale);background:var(--surface);transition:background .15s;}
+.insp-item-text{font-size:13px;color:var(--text2);line-height:1.5;font-weight:500;}
+.radio-row{display:flex;gap:6px;}
+.radio-btn{flex:1;height:38px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-xs);border:1.5px solid var(--border);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.5px;transition:all .15s;user-select:none;-webkit-user-select:none;background:var(--surface2);color:var(--text3);}
+.radio-btn:active{transform:scale(.96);}
+.radio-btn.sel-SI{background:var(--green-bg);border-color:var(--green);color:var(--green);font-weight:700;}
+.radio-btn.sel-NO{background:var(--red-bg);border-color:var(--red);color:var(--red);font-weight:700;}
+.radio-btn.sel-PARCIAL{background:var(--yellow-bg);border-color:var(--yellow);color:var(--yellow);font-weight:700;}
+.radio-btn.sel-NA{background:var(--sky-pale);border-color:var(--border2);color:var(--text3);}
+.obs-input{width:100%;background:var(--sky-ultra);border:1.5px solid var(--border);border-radius:var(--radius-xs);color:var(--text2);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;padding:10px 12px;outline:none;transition:border-color .2s;}
+.obs-input:focus{border-color:var(--sky);}
+.obs-input::placeholder{color:var(--text4);}
+/* Photo upload */
+.photo-section{margin-top:8px;}
+.photo-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+.photo-thumb{width:64px;height:64px;border-radius:6px;object-fit:cover;border:2px solid var(--border);cursor:pointer;}
+.photo-add-btn{width:64px;height:64px;border-radius:6px;border:2px dashed var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--sky-ultra);color:var(--sky);font-size:22px;transition:all .15s;}
+.photo-add-btn:active{transform:scale(.96);}
+.photo-file-input{display:none;}
+/* ── FORM FIELDS ── */
+.form-group{margin-bottom:14px;}
+.form-label{display:block;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
+.form-label .req{color:var(--red);}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;padding:12px 14px;outline:none;appearance:none;-webkit-appearance:none;transition:border-color .2s,box-shadow .2s;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--sky);box-shadow:0 0 0 3px rgba(14,165,233,.15);background:white;}
+.form-textarea{resize:vertical;min-height:80px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:500px){.form-row{grid-template-columns:1fr;}}
+.select-wrap{position:relative;}
+.select-wrap::after{content:'▾';position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--sky);pointer-events:none;font-size:14px;}
+/* ── BUTTONS ── */
+.btn{padding:14px 20px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:.3px;transition:all .2s;display:inline-flex;align-items:center;gap:8px;justify-content:center;-webkit-tap-highlight-color:transparent;user-select:none;}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:linear-gradient(135deg,var(--sky),var(--sky-dark));color:white;box-shadow:0 4px 12px rgba(14,165,233,.3);}
+.btn-green{background:linear-gradient(135deg,#10b981,#059669);color:white;box-shadow:0 4px 12px rgba(16,185,129,.25);}
+.btn-secondary{background:var(--sky-pale);color:var(--sky-dark);border:1.5px solid var(--border2);}
+.btn-email{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;box-shadow:0 4px 12px rgba(79,70,229,.3);}
+.btn-qr{background:linear-gradient(135deg,#0891b2,#0e7490);color:white;box-shadow:0 4px 12px rgba(8,145,178,.3);}
+.btn-orange{background:linear-gradient(135deg,#ea580c,#c2410c);color:white;}
+.btn-block{width:100%;margin-bottom:8px;}
+.btn-sm{padding:8px 14px;font-size:12px;}
+.action-bar{display:flex;flex-direction:column;gap:8px;padding:16px;background:var(--surface);border-top:1px solid var(--border);position:sticky;bottom:80px;z-index:80;}
+/* ── BADGES ── */
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.3px;}
+.badge-A{background:var(--red-bg);color:var(--red);border:1px solid var(--red-b);}
+.badge-B{background:var(--yellow-bg);color:var(--yellow);border:1px solid var(--yellow-b);}
+.badge-C{background:var(--green-bg);color:var(--green);border:1px solid var(--green-b);}
+.badge-CUMPLIDO{background:var(--green-bg);color:var(--green);border:1px solid var(--green-b);}
+.badge-PENDIENTE{background:var(--red-bg);color:var(--red);border:1px solid var(--red-b);}
+.badge-EN_PROCESO{background:var(--yellow-bg);color:var(--yellow);border:1px solid var(--yellow-b);}
+/* ── ACPM TABLE ── */
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.acpm-table{width:100%;border-collapse:collapse;min-width:580px;}
+.acpm-table th{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);padding:10px 12px;border-bottom:2px solid var(--border2);text-align:left;white-space:nowrap;background:var(--sky-ultra);cursor:pointer;}
+.acpm-table th:hover{color:var(--sky-dark);}
+.acpm-table td{padding:10px 12px;border-bottom:1px solid var(--sky-pale);color:var(--text2);font-size:12px;vertical-align:middle;}
+.acpm-table tr:hover td{background:var(--sky-ultra);}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center;}
+.filter-chip{padding:7px 14px;border-radius:20px;border:1.5px solid var(--border);font-size:11px;font-weight:600;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap;user-select:none;background:var(--surface);}
+.filter-chip.active{border-color:var(--sky);color:var(--sky-dark);background:var(--sky-pale);}
+.filter-chip.fc-red{border-color:var(--red);color:var(--red);background:var(--red-bg);}
+.filter-chip.fc-yellow{border-color:var(--yellow);color:var(--yellow);background:var(--yellow-bg);}
+.filter-chip.fc-green{border-color:var(--green);color:var(--green);background:var(--green-bg);}
+.search-input{flex:1;min-width:160px;background:var(--surface2);border:1.5px solid var(--border);border-radius:20px;padding:8px 16px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:var(--text);outline:none;}
+.search-input:focus{border-color:var(--sky);}
+.search-input::placeholder{color:var(--text4);}
+/* ── SEVER CARDS ── */
+.sev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.sev-card{padding:14px 8px;border-radius:var(--radius-sm);border:2px solid var(--border);cursor:pointer;text-align:center;transition:all .15s;background:var(--surface2);}
+.sev-card:active{transform:scale(.97);}
+.sev-class{font-size:26px;font-weight:800;line-height:1;}
+.sev-name{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:4px;font-weight:600;}
+.sev-time{font-size:9px;color:var(--text4);margin-top:2px;}
+.sev-card.sel-A{border-color:var(--red);background:var(--red-bg);}
+.sev-card.sel-B{border-color:var(--yellow);background:var(--yellow-bg);}
+.sev-card.sel-C{border-color:var(--green);background:var(--green-bg);}
+/* ── MODALS ── */
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .3s;}
+@media(min-width:600px){.overlay{align-items:center;justify-content:center;}}
+.overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--surface);border-radius:var(--radius) var(--radius) 0 0;padding:24px;width:100%;max-height:92vh;overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.16,1,.3,1);}
+@media(min-width:600px){.modal{border-radius:var(--radius);max-width:580px;transform:scale(.95);}}
+.overlay.open .modal{transform:translateY(0);}
+@media(min-width:600px){.overlay.open .modal{transform:scale(1);}}
+.modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 20px;}
+@media(min-width:600px){.modal-handle{display:none;}}
+.modal-title{font-size:18px;font-weight:800;margin-bottom:4px;color:var(--text);}
+.modal-sub{font-size:12px;color:var(--text3);margin-bottom:20px;}
+.modal-close{float:right;background:var(--sky-pale);border:none;color:var(--sky-dark);cursor:pointer;width:30px;height:30px;border-radius:50%;font-size:14px;display:flex;align-items:center;justify-content:center;}
+/* ── QR SECTION ── */
+.qr-canvas-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;padding:16px;background:var(--sky-ultra);border-radius:var(--radius-sm);border:1.5px solid var(--border);}
+#qrCanvas{border-radius:8px;}
+/* ── REC CARDS ── */
+.rec-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;border-top:3px solid var(--sky);}
+.rec-num{display:inline-flex;background:var(--sky);color:white;width:26px;height:26px;border-radius:50%;text-align:center;align-items:center;justify-content:center;font-size:12px;font-weight:800;margin-bottom:10px;}
+.rec-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:8px;}
+.rec-text{font-size:13px;color:var(--text2);line-height:1.75;}
+.rec-tag{display:inline-block;margin-top:12px;padding:4px 12px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;background:var(--sky-pale);color:var(--sky-dark);border:1px solid var(--border2);}
+.step-list{list-style:none;margin-top:10px;display:flex;flex-direction:column;gap:10px;}
+.step-list li{display:flex;gap:10px;align-items:flex-start;}
+.step-num{width:22px;height:22px;background:var(--sky);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:1px;}
+.step-text{font-size:12px;color:var(--text2);line-height:1.6;}
+/* ── HIGHLIGHT BOX ── */
+.info-box{border-radius:var(--radius-sm);padding:14px;margin:12px 0;}
+.info-box.sky{background:var(--sky-pale);border:1px solid var(--border2);}
+.info-box.green{background:var(--green-bg);border:1px solid var(--green-b);}
+.info-box.yellow{background:var(--yellow-bg);border:1px solid var(--yellow-b);}
+.info-box.red{background:var(--red-bg);border:1px solid var(--red-b);}
+.info-box-title{font-size:12px;font-weight:800;margin-bottom:6px;}
+.info-box.sky .info-box-title{color:var(--sky-dark);}
+.info-box.green .info-box-title{color:var(--green);}
+.info-box.yellow .info-box-title{color:var(--yellow);}
+.info-box.red .info-box-title{color:var(--red);}
+/* ── TOAST ── */
+.toast{position:fixed;top:72px;left:50%;transform:translateX(-50%) translateY(-10px);background:#0c1a2e;color:white;border-radius:24px;padding:12px 20px;display:flex;align-items:center;gap:10px;z-index:9999;opacity:0;transition:all .3s cubic-bezier(.16,1,.3,1);max-width:320px;width:calc(100% - 32px);box-shadow:var(--shadow);pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast-icon{font-size:20px;flex-shrink:0;}
+.toast-title{font-size:13px;font-weight:700;margin-bottom:1px;}
+.toast-sub{font-size:11px;opacity:.75;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:var(--sky-ultra);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+code{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--sky-pale);padding:2px 6px;border-radius:3px;color:var(--sky-dark);}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-logo">SG<span>-</span>SST <span style="font-weight:400;opacity:.8;font-size:13px;">Sistema Integrado</span></div>
+  <div class="header-badge">v3.0</div>
+  <div class="header-date" id="currentDate"></div>
+  <div id="saveIndicator" style="font-size:10px;color:rgba(255,255,255,.7);margin-left:8px;display:none;">💾 Guardado</div>
+</header>
+
+<div class="progress-strip" id="progressStrip" style="display:none;">
+  <span style="font-size:11px;color:var(--text3);font-weight:600;">Avance</span>
+  <div class="progress-track"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+  <div class="progress-pct" id="progPct">0%</div>
+  <div style="display:flex;gap:4px;">
+    <div class="pbadge pbadge-no" id="pNo" style="display:none">0 NO</div>
+    <div class="pbadge pbadge-parc" id="pParc" style="display:none">0 PARC</div>
+  </div>
+</div>
+
+<main class="main">
+
+<!-- ════════════════ DASHBOARD ════════════════ -->
+<div id="sec-dashboard" class="section active">
+  <div class="page-title">Dashboard SG-SST</div>
+  <div class="page-sub">Res. 0312/2019 · ISO 9001:2015 §10.2 · <span id="dashDate"></span></div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card kpi-sky"><div class="kpi-val" id="kpi-total">0</div><div class="kpi-lbl">Total</div></div>
+    <div class="kpi-card kpi-green"><div class="kpi-val" id="kpi-cum">0</div><div class="kpi-lbl">✅ Cerrados</div></div>
+    <div class="kpi-card kpi-yellow"><div class="kpi-val" id="kpi-proc">0</div><div class="kpi-lbl">⏳ Proceso</div></div>
+    <div class="kpi-card kpi-red"><div class="kpi-val" id="kpi-pend">0</div><div class="kpi-lbl">🔴 Pendiente</div></div>
+    <div class="kpi-card kpi-orange"><div class="kpi-val" id="kpi-ef">—</div><div class="kpi-lbl">🎯 Eficacia</div></div>
+    <div class="kpi-card kpi-red"><div class="kpi-val" id="kpi-grv">0</div><div class="kpi-lbl">⚠️ Clase A</div></div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="card">
+      <div class="card-title">🎯 Distribución por Severidad</div>
+      <div class="donut-wrap">
+        <div class="donut-container">
+          <svg viewBox="0 0 100 100" style="width:100%;height:100%;">
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#e0f2fe" stroke-width="14"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#dc2626" stroke-width="14" stroke-dasharray="0 238.7" stroke-linecap="round" transform="rotate(-90 50 50)" id="d-A"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#d97706" stroke-width="14" stroke-dasharray="0 238.7" stroke-linecap="round" transform="rotate(-90 50 50)" id="d-B"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#059669" stroke-width="14" stroke-dasharray="0 238.7" stroke-linecap="round" transform="rotate(-90 50 50)" id="d-C"/>
+          </svg>
+          <div class="donut-center"><div class="donut-pct" id="donut-ef">—</div><div class="donut-lbl2">EFICACIA</div></div>
+        </div>
+        <div class="donut-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#dc2626"></div><span class="legend-text">Clase A — Grave</span><span class="legend-count" id="leg-A">0</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background:#d97706"></div><span class="legend-text">Clase B — Seria</span><span class="legend-count" id="leg-B">0</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background:#059669"></div><span class="legend-text">Clase C — Leve</span><span class="legend-count" id="leg-C">0</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card"><div class="card-title">📊 Por Tipo de Condición</div><div class="bar-chart" id="condBar"></div></div>
+    <div class="card"><div class="card-title">📈 Indicadores ISO 9001:2015</div><table class="ind-table" id="indTable"></table></div>
+    <div class="card"><div class="card-title">📅 Tendencia Anual</div><div class="bar-chart" id="anoBar"></div></div>
+  </div>
+
+  <!-- Inspecciones guardadas -->
+  <div class="card" id="inspHistoryCard" style="display:none;">
+    <div class="card-title">🕐 Últimas Inspecciones Guardadas</div>
+    <div id="inspHistoryList"></div>
+  </div>
+
+  <div class="card" style="border-top:3px solid #4f46e5;">
+    <div class="card-title">📧 Compartir Informe Diario</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Genera el informe del día con gráficas, KPIs y tabla de hallazgos. Selecciona la inspección y envía a todos los procesos.</p>
+    <div class="select-wrap form-group"><select class="form-select" id="inspSelectForEmail" style="font-size:13px;"><option value="all">— Informe general (todos los datos) —</option></select></div>
+    <button class="btn btn-email btn-block" onclick="openEmailModal()">📧 Generar & Enviar Informe por Correo</button>
+    <button class="btn btn-qr btn-block" onclick="showSection('qr',document.querySelector('[data-sec=qr]'))">📷 Generador de Códigos QR</button>
+  </div>
+
+  <div class="card"><div class="card-title">🔴 Últimos Hallazgos</div>
+    <div class="table-wrap"><table class="acpm-table"><thead><tr><th>N°</th><th>Área</th><th>Hallazgo</th><th>Clase</th><th>Estado</th></tr></thead><tbody id="dashTbody"></tbody></table></div>
+  </div>
+</div>
+
+<!-- ════════════════ INSPECCIÓN ════════════════ -->
+<div id="sec-inspeccion" class="section">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <div><div class="page-title">Nueva Inspección</div><div class="page-sub">FO-THU-30 · Higiene y Seguridad Industrial</div></div>
+    <button class="btn btn-secondary btn-sm" onclick="clearForm()">🗑️</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📋 Identificación</div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Fecha <span class="req">*</span></label><input type="date" class="form-input" id="f-fecha"></div>
+      <div class="form-group"><label class="form-label">Inspector <span class="req">*</span></label><input type="text" class="form-input" id="f-inspector" placeholder="Nombre completo"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Sede <span class="req">*</span></label>
+        <div class="select-wrap"><select class="form-select" id="f-lugar"><option value="">— Sede —</option><option>Zona Franca del Pacífico</option><option>Sede Principal</option><option>Planta de Producción 1</option><option>Planta de Producción 2</option><option>Bodega</option><option>Oficinas Administrativas</option></select></div>
+      </div>
+      <div class="form-group"><label class="form-label">Área <span class="req">*</span></label><input type="text" class="form-input" id="f-area" placeholder="Área específica"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Cargo</label><input type="text" class="form-input" id="f-cargo" placeholder="Cargo"></div>
+      <div class="form-group"><label class="form-label">Proceso</label>
+        <div class="select-wrap"><select class="form-select" id="f-proceso"><option value="">— Proceso —</option><option>Producción</option><option>Bodega</option><option>Administrativo</option><option>Mantenimiento</option><option>Logística</option><option>Calidad</option></select></div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">📸 Fotos Generales de la Inspección</label>
+      <div class="photo-row" id="generalPhotos">
+        <div class="photo-add-btn" onclick="document.getElementById('genPhotoInput').click()">+</div>
+        <input type="file" id="genPhotoInput" class="photo-file-input" multiple accept="image/*" capture="environment" onchange="addPhotos(this,'generalPhotos')">
+      </div>
+    </div>
+  </div>
+
+  <div style="background:var(--sky-pale);border:1.5px solid var(--border2);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:14px;display:flex;gap:14px;flex-wrap:wrap;">
+    <span style="font-size:11px;font-weight:700;color:var(--green);">● SI = Cumple totalmente</span>
+    <span style="font-size:11px;font-weight:700;color:var(--red);">● NO = No cumple</span>
+    <span style="font-size:11px;font-weight:700;color:var(--yellow);">● PARC = Cumple parcialmente</span>
+    <span style="font-size:11px;font-weight:700;color:var(--text4);">● N/A = No aplica</span>
+  </div>
+
+  <div id="inspItems"></div>
+
+  <div class="action-bar">
+    <button class="btn btn-primary btn-block" onclick="saveInspection()">💾 Guardar Inspección</button>
+    <button class="btn btn-green btn-block" onclick="sendToACPM()">🔗 Enviar Hallazgos → Matriz ACPM</button>
+  </div>
+</div>
+
+<!-- ════════════════ ACPM ════════════════ -->
+<div id="sec-acpm" class="section">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+    <div><div class="page-title">Matriz ACPM</div><div class="page-sub">FO-THU-45 fusionada con Inspecciones · Dec.1072/2015 | Res.0312/2019</div></div>
+    <button class="btn btn-primary btn-sm" onclick="openNewACPM()">+ Nuevo</button>
+  </div>
+
+  <!-- Confirmación fusión -->
+  <div class="info-box green" style="margin-bottom:14px;">
+    <div class="info-box-title">✅ Confirmado: La ACPM ya está fusionada con las Inspecciones</div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.7;">Sí, <strong>ya no necesitas llevar la Matriz ACPM por separado</strong>. Cada vez que guardas una inspección y presionas "Enviar Hallazgos → ACPM", los ítems NO y PARCIAL se registran automáticamente aquí como acciones pendientes de seguimiento. Toda la información — inspecciones, hallazgos, acciones correctivas, indicadores y gráficas — está centralizada en este único sistema. La Matriz ACPM individual (FO-THU-45 Excel) ya no es necesaria.</div>
+  </div>
+
+  <div class="filters">
+    <input type="search" class="search-input" id="acpmSearch" placeholder="🔍 Buscar..." oninput="renderACPMTable()">
+    <div class="filter-chip active" onclick="setFilter('TODOS',this)">Todos</div>
+    <div class="filter-chip" onclick="setFilter('CUMPLIDO',this)">✅ Cumplido</div>
+    <div class="filter-chip" onclick="setFilter('EN PROCESO',this)">⏳ Proceso</div>
+    <div class="filter-chip" onclick="setFilter('PENDIENTE',this)">🔴 Pendiente</div>
+    <div class="filter-chip" onclick="toggleClass('A',this)" id="fc-A">🔴 A</div>
+    <div class="filter-chip" onclick="toggleClass('B',this)" id="fc-B">🟡 B</div>
+    <div class="filter-chip" onclick="toggleClass('C',this)" id="fc-C">🟢 C</div>
+  </div>
+
+  <div class="card" style="padding:0;overflow:hidden;">
+    <div class="table-wrap">
+      <table class="acpm-table">
+        <thead><tr><th onclick="sort('n')">N°</th><th onclick="sort('fecha')">Fecha</th><th onclick="sort('area')">Área</th><th onclick="sort('detalle')" style="min-width:150px;">Hallazgo</th><th onclick="sort('clase')">Clase</th><th onclick="sort('estado')">Estado</th><th>▲▼</th></tr></thead>
+        <tbody id="acpmTbody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);margin-top:8px;display:flex;align-items:center;gap:12px;">
+    <span id="acpmCount">0</span> registros
+    <button class="btn btn-secondary btn-sm" onclick="exportCSV()">📥 Exportar CSV</button>
+  </div>
+</div>
+
+<!-- ════════════════ QR ════════════════ -->
+<div id="sec-qr" class="section">
+  <div class="page-title">📷 Generador de Códigos QR</div>
+  <div class="page-sub">Crea tarjetas QR con foto para máquinas, áreas o procesos</div>
+
+  <!-- Guía GitHub — solo admin -->
+  <div style="margin-bottom:16px;">
+    <button class="btn btn-secondary btn-sm" onclick="toggleAdminGuide()" id="adminGuideBtn">🔧 Ver guía de administración (solo admin)</button>
+  </div>
+  <div id="adminGuideSection" style="display:none;">
+    <div class="info-box sky" style="margin-bottom:12px;">
+      <div class="info-box-title">🔒 Sección de Administrador — No compartir con inspectores</div>
+      <div style="font-size:12px;color:var(--text2);">Esta sección contiene instrucciones técnicas de configuración. Los inspectores no necesitan verla.</div>
+    </div>
+    <div class="card" style="border-top:4px solid #059669;margin-bottom:12px;">
+      <div class="card-title" style="color:var(--green);">📋 Cómo subir/actualizar el archivo en GitHub</div>
+
+      <div class="info-box yellow" style="margin-bottom:14px;">
+        <div class="info-box-title">⚠️ Problema con el nombre del archivo — solución</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.8;">
+          El archivo quedó como <code>índice.html</code> (con tilde en la í). GitHub Pages necesita exactamente <code>index.html</code> (sin tilde, todo en minúsculas).<br><br>
+          <strong>Cómo corregirlo:</strong><br>
+          1. Ve al repositorio SGSST en GitHub<br>
+          2. Clic en el archivo <code>índice.html</code><br>
+          3. Clic en el lápiz ✏️ (editar)<br>
+          4. Borra el nombre y escribe exactamente: <code>index.html</code><br>
+          5. Clic en "Confirmar cambios"<br>
+          6. Espera 2 min → prueba la URL
+        </div>
+      </div>
+
+      <ul class="step-list">
+        <li><div class="step-num">1</div><div class="step-text">Ve a <code>github.com/gestionhumanamhc-alt/SGSST</code> → verifica rama <strong>principal</strong></div></li>
+        <li><div class="step-num">2</div><div class="step-text">Para <strong>actualizar</strong>: clic en el archivo → lápiz ✏️ → arriba en el nombre del archivo borra todo y escribe <code>index.html</code> → "Confirmar cambios"</div></li>
+        <li><div class="step-num">3</div><div class="step-text">Para <strong>subir versión nueva</strong>: "Agregar archivo" → "Cargar archivos" → sube el HTML → nómbralo <code>index.html</code> → "Confirmar cambios"</div></li>
+        <li><div class="step-num">4</div><div class="step-text">Espera 2-3 min → abre: <code>https://gestionhumanamhc-alt.github.io/SGSST/</code></div></li>
+        <li><div class="step-num">5</div><div class="step-text"><strong>Agregar al celular:</strong> Chrome Android → ⋮ → "Agregar a pantalla de inicio" | iPhone → 📤 → "En el inicio"</div></li>
+      </ul>
+    </div>
+
+    <div class="card" style="border-top:4px solid var(--red);margin-bottom:12px;">
+      <div class="card-title" style="color:var(--red);">🗄️ Gestión de Datos Guardados</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.7;">
+        Los datos se guardan automáticamente en este dispositivo (localStorage). Al cambiar el estado de un registro o guardar una inspección, se guarda de inmediato y persiste al recargar la página.<br>
+        <strong>Nota:</strong> Los datos se guardan por dispositivo. Si usas otro celular o PC, no verás los mismos registros a menos que estén en el código base.
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-secondary btn-sm" onclick="exportAndBackup()">💾 Exportar respaldo JSON</button>
+        <button class="btn btn-orange btn-sm" onclick="resetToDefault()">🔄 Restablecer datos base</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="border-top:3px solid var(--sky);">
+    <div class="card-title">⚙️ Crear Código QR con Foto</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">¿Para qué es el QR? <span class="req">*</span></label>
+        <div class="select-wrap"><select class="form-select" id="qr-tipo" onchange="updateQRLabel()">
+          <option value="">— Seleccionar —</option>
+          <option value="area">Área de trabajo</option>
+          <option value="maquina">Máquina o Equipo</option>
+          <option value="proceso">Proceso</option>
+          <option value="vehiculo">Vehículo</option>
+          <option value="extintor">Extintor</option>
+          <option value="ruta">Ruta de evacuación</option>
+          <option value="custom">Personalizado</option>
+        </select></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" id="qr-label-lbl">Nombre / Identificación <span class="req">*</span></label>
+        <input type="text" class="form-input" id="qr-nombre" placeholder="Ej: Sierra Circular – Corte">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Información adicional (serial, código, área)</label>
+      <input type="text" class="form-input" id="qr-info" placeholder="Ej: S/N: 00123 · Planta Producción 1">
+    </div>
+    <!-- FOTO DE LA MÁQUINA/ÁREA -->
+    <div class="form-group">
+      <label class="form-label">📸 Foto de la Máquina o Área <span style="font-weight:400;color:var(--text3);">(aparece en el QR impreso)</span></label>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:80px;height:80px;border-radius:8px;border:2px dashed var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--sky-ultra);color:var(--sky);font-size:28px;flex-shrink:0;overflow:hidden;" id="qrPhotoPreview" onclick="document.getElementById('qrPhotoInput').click()">
+          📷
+        </div>
+        <div>
+          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('qrPhotoInput').click()">📷 Subir foto</button>
+          <input type="file" id="qrPhotoInput" style="display:none;" accept="image/*" capture="environment" onchange="loadQRPhoto(this)">
+          <div style="font-size:11px;color:var(--text3);margin-top:6px;">Toma una foto o sube desde la galería.<br>Aparecerá en la tarjeta impresa del QR.</div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">URL que abrirá el QR <span class="req">*</span></label>
+      <input type="text" class="form-input" id="qr-url" value="https://gestionhumanamhc-alt.github.io/gestionhumanamhc.github.io/" placeholder="https://tuusuario.github.io/sgsst/">
+      <div style="font-size:11px;color:var(--green);margin-top:4px;font-weight:600;">✅ URL pre-cargada. Actualízala después de subir el archivo a GitHub.</div>
+    </div>
+    <button class="btn btn-qr btn-block" onclick="generateQR()">📷 Generar Código QR con Foto</button>
+  </div>
+
+  <div class="card" id="qrResultCard" style="display:none;">
+    <div class="card-title">✅ Código QR Real — Escaneable</div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:16px;background:var(--sky-ultra);border-radius:var(--radius-sm);border:1.5px solid var(--border);">
+      <!-- Tarjeta QR completa con foto -->
+      <canvas id="qrPrintCanvas" width="320" height="420" style="border-radius:12px;box-shadow:0 4px 20px rgba(14,165,233,.2);max-width:100%;"></canvas>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+        <button class="btn btn-primary btn-sm" onclick="downloadQR()">⬇️ Descargar PNG</button>
+        <button class="btn btn-secondary btn-sm" onclick="printQR()">🖨️ Imprimir Tarjeta</button>
+      </div>
+      <div id="qrUrlDisplay" style="font-size:10px;color:var(--text4);text-align:center;word-break:break-all;max-width:280px;"></div>
+    </div>
+    <div class="info-box green" style="margin-top:14px;">
+      <div class="info-box-title">✅ Este QR SÍ funciona — cómo probarlo</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.9;">
+        1. Abre la <strong>cámara</strong> de tu celular (no una app, la cámara normal)<br>
+        2. Apunta al QR durante 2-3 segundos<br>
+        3. Aparece una notificación arriba → toca para abrir<br>
+        4. En iPhone: funciona directo. En Android: asegúrate que "Google Lens" esté activo en la cámara
+      </div>
+    </div>
+  </div>
+
+
+
+<!-- ════════════════ RECOMENDACIONES ════════════════ -->
+<div id="sec-rec" class="section">
+  <div class="page-title">Recomendaciones Técnicas</div>
+  <div class="page-sub">Guía completa de implementación — cada recomendación con sus pasos detallados</div>
+
+  <!-- CONFIRMACIÓN FUSIÓN ACPM -->
+  <div class="info-box green" style="margin-bottom:20px;">
+    <div class="info-box-title" style="font-size:14px;">✅ Respuesta a tu pregunta: ¿La ACPM ya está fusionada?</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.8;">
+      <strong>Sí, completamente.</strong> Con este sistema ya NO necesitas llevar la Matriz ACPM (FO-THU-45) por separado en Excel. Aquí funciona así:<br>
+      • Haces la inspección → los hallazgos NO y PARCIAL pasan automáticamente a la Matriz ACPM integrada<br>
+      • La ACPM tiene seguimiento de estado (Pendiente → En Proceso → Cumplido), responsable, plan de acción y fecha límite<br>
+      • El Dashboard calcula todos los indicadores en tiempo real: eficacia, clase A, acciones correctivas, tendencia anual<br>
+      • Puedes exportar a CSV en cualquier momento para archivos o auditorías<br>
+      • Todo está en un solo lugar: inspección + ACPM + indicadores + informe de correo
+    </div>
+  </div>
+
+  <div class="rec-card">
+    <div class="rec-num">01</div>
+    <div class="rec-title">Publicar la App en Internet (GitHub Pages — Gratis)</div>
+    <div class="rec-text">Para acceder desde el celular y que los QR funcionen, la app debe estar publicada en una URL pública.</div>
+    <ul class="step-list" style="margin-top:12px;">
+      <li><div class="step-num">1</div><div class="step-text">Ve a <code>github.com</code> y crea una cuenta gratuita</div></li>
+      <li><div class="step-num">2</div><div class="step-text">Clic en "New repository" → nombre: <code>sgsst</code> → Public → Create</div></li>
+      <li><div class="step-num">3</div><div class="step-text">Clic en "uploading an existing file" → arrastra el archivo HTML → "Commit changes"</div></li>
+      <li><div class="step-num">4</div><div class="step-text">Ve a Settings → Pages → Source: Deploy from branch → main → Save</div></li>
+      <li><div class="step-num">5</div><div class="step-text">En 2 minutos tu app estará en <code>tuusuario.github.io/sgsst</code> — URL permanente y gratuita</div></li>
+      <li><div class="step-num">6</div><div class="step-text">Comparte esa URL con todos los inspectores. Funciona en cualquier celular sin instalar nada.</div></li>
+    </ul>
+    <span class="rec-tag">Prioritario · Paso 1</span>
+  </div>
+
+  <div class="rec-card">
+    <div class="rec-num">02</div>
+    <div class="rec-title">Agregar la App a la Pantalla de Inicio del Celular</div>
+    <div class="rec-text">Una vez publicada en GitHub Pages, cualquier inspector puede agregarla como ícono de app sin usar Play Store ni App Store.</div>
+    <ul class="step-list" style="margin-top:12px;">
+      <li><div class="step-num">1</div><div class="step-text"><strong>Android (Chrome):</strong> Abre la URL en Chrome → toca el menú ⋮ → "Agregar a pantalla de inicio" → "Agregar"</div></li>
+      <li><div class="step-num">2</div><div class="step-text"><strong>iPhone (Safari):</strong> Abre la URL en Safari → toca el ícono compartir 📤 → "En el inicio" → "Agregar"</div></li>
+      <li><div class="step-num">3</div><div class="step-text">Aparece el ícono en la pantalla de inicio como una app normal. Al abrirla, ocupa toda la pantalla sin barra del navegador.</div></li>
+    </ul>
+    <span class="rec-tag">Quick Win · 5 minutos</span>
+  </div>
+
+  <div class="rec-card">
+    <div class="rec-num">03</div>
+    <div class="rec-title">Códigos QR para Máquinas y Áreas</div>
+    <div class="rec-text">Con la URL de GitHub Pages, genera un QR por cada área o máquina usando el Generador de QR integrado en la pestaña 📷 QR.</div>
+    <ul class="step-list" style="margin-top:12px;">
+      <li><div class="step-num">1</div><div class="step-text">Ve a la pestaña <strong>📷 QR</strong> de esta app → selecciona el tipo (Área, Máquina, etc.) → escribe el nombre → pega la URL de GitHub Pages → "Generar QR"</div></li>
+      <li><div class="step-num">2</div><div class="step-text">Descarga el QR (botón "Descargar QR") → imprime en papel adhesivo o lamínalo</div></li>
+      <li><div class="step-num">3</div><div class="step-text">Pega el QR en la máquina o área. El inspector escanea con la cámara del celular → abre directamente el formulario</div></li>
+      <li><div class="step-num">4</div><div class="step-text"><strong>Alternativa gratuita:</strong> En <code>qr-code-generator.com</code> pega la URL → descarga PNG → imprime</div></li>
+    </ul>
+    <div class="info-box yellow" style="margin-top:12px;">
+      <div class="info-box-title">⚠️ ¿Por qué el QR no funcionó antes?</div>
+      <div style="font-size:12px;color:var(--text2);">El archivo HTML guardado en el celular o enviado por WhatsApp tiene una dirección <code>file:///</code> que solo funciona en ese dispositivo. El QR necesita una URL pública <code>https://</code>. Solución: publicar en GitHub Pages (Recomendación 01).</div>
+    </div>
+    <span class="rec-tag">Agiliza el trabajo en campo</span>
+  </div>
+
+  <div class="rec-card">
+    <div class="rec-num">04</div>
+    <div class="rec-title">Registro Fotográfico en las Inspecciones</div>
+    <div class="rec-text">Ya está implementado en el formulario de inspección. Cada ítem tiene un botón 📷 para agregar fotos directamente desde la cámara del celular.</div>
+    <ul class="step-list" style="margin-top:12px;">
+      <li><div class="step-num">1</div><div class="step-text">En el formulario de inspección, toca el ícono <strong>+</strong> en cualquier ítem → abre la cámara → toma la foto del hallazgo</div></li>
+      <li><div class="step-num">2</div><div class="step-text">Las fotos aparecen como miniaturas en el ítem. Puedes agregar varias fotos por hallazgo.</div></li>
+      <li><div class="step-num">3</div><div class="step-text">Al generar el informe de correo, las fotos de los hallazgos NO y PARCIAL se incluyen automáticamente.</div></li>
+      <li><div class="step-num">4</div><div class="step-text"><strong>Para guardar las fotos en la nube permanentemente:</strong> Usa Google Drive en el celular → Carpeta SST/Inspecciones/Fecha → sube las fotos manualmente. O configura Google Photos con sincronización automática.</div></li>
+    </ul>
+    <div class="info-box sky" style="margin-top:12px;">
+      <div class="info-box-title">💡 Organización recomendada de fotos en Drive</div>
+      <div style="font-size:12px;color:var(--text2);">📁 INSPECCIONES-SST / 2026 / 02-Febrero / 2026-02-26_ZonaFranca_Producción / foto1.jpg</div>
+    </div>
+    <span class="rec-tag">Evidencia documental</span>
+  </div>
+
+  <div class="rec-card">
+    <div class="rec-num">05</div>
+    <div class="rec-title">Envío del Informe Diario por Correo con Gráficas</div>
+    <div class="rec-text">El sistema genera un informe HTML profesional con KPIs, gráficas y tabla de hallazgos para enviar a todos los procesos.</div>
+    <ul class="step-list" style="margin-top:12px;">
+      <li><div class="step-num">1</div><div class="step-text">Termina el recorrido → ve al <strong>Dashboard</strong> → selecciona la inspección del día en el selector → "Generar & Enviar Informe"</div></li>
+      <li><div class="step-num">2</div><div class="step-text">Escribe los correos de todos los procesos en el campo "Para"</div></li>
+      <li><div class="step-num">3</div><div class="step-text"><strong>Opción A (Gmail):</strong> Toca "Abrir en Mi Correo" → en Gmail, ve al compositor → más opciones → "Pegar como HTML" → enviar</div></li>
+      <li><div class="step-num">4</div><div class="step-text"><strong>Opción B (cualquier correo):</strong> Toca "Copiar HTML del Correo" → abre tu correo → crea mensaje nuevo → pega el contenido → enviar</div></li>
+      <li><div class="step-num">5</div><div class="step-text"><strong>Opción C (más fácil — recomendada):</strong> Configura una plantilla de correo en Gmail con el enlace de la app. Así solo envías el enlace y los destinatarios ven el dashboard en tiempo real.</div></li>
+    </ul>
+    <span class="rec-tag">Comunicación a procesos</span>
+  </div>
+
+  <div class="rec-card">
+    <div class="rec-num">06</div>
+    <div class="rec-title">Google Forms como Alternativa o Complemento</div>
+    <div class="rec-text">Si prefieres usar Google Forms para las inspecciones y conectarlo automáticamente con la ACPM en Google Sheets.</div>
+    <ul class="step-list" style="margin-top:12px;">
+      <li><div class="step-num">1</div><div class="step-text">En Google Drive → Nuevo → Formularios de Google → crea las secciones de inspección (una por categoría)</div></li>
+      <li><div class="step-num">2</div><div class="step-text">En cada pregunta agrega una pregunta "Si NO o PARCIAL, describe el hallazgo" con lógica condicional</div></li>
+      <li><div class="step-num">3</div><div class="step-text">Las respuestas van automáticamente a Google Sheets → Extensiones → Apps Script → pega este código:<br><code>function onFormSubmit(e){var ss=SpreadsheetApp.getActive();var acpm=ss.getSheetByName('ACPM');var vals=e.values;if(vals.includes('NO')||vals.includes('PARCIAL')){acpm.appendRow([vals[0],vals[1],'PENDIENTE']);}}</code></div></li>
+      <li><div class="step-num">4</div><div class="step-text">Activa el trigger: Editar → Triggers → onFormSubmit → Guardar</div></li>
+      <li><div class="step-num">5</div><div class="step-text">Conecta Google Sheets con <strong>Looker Studio</strong> (gratuito) para dashboard en tiempo real</div></li>
+    </ul>
+    <span class="rec-tag">Alternativa Google Workspace</span>
+  </div>
+
+  <div class="rec-card">
+    <div class="rec-num">07</div>
+    <div class="rec-title">Notificaciones Automáticas por Hallazgos Críticos</div>
+    <div class="rec-text">Configura alertas automáticas para que los responsables reciban notificación inmediata cuando se detecta un hallazgo Clase A.</div>
+    <ul class="step-list" style="margin-top:12px;">
+      <li><div class="step-num">1</div><div class="step-text"><strong>Con Google Sheets + Apps Script:</strong> Agrega en el script una condición: si Clase = "A", enviar email con <code>MailApp.sendEmail(destino, asunto, cuerpo)</code></div></li>
+      <li><div class="step-num">2</div><div class="step-text"><strong>Con Zapier (gratis hasta 100 tareas/mes):</strong> Conecta Google Sheets con Gmail → cuando se agrega fila con Clase A → enviar correo al responsable</div></li>
+      <li><div class="step-num">3</div><div class="step-text"><strong>Con WhatsApp Business API:</strong> Conecta Zapier → WhatsApp → envío de mensaje automático al responsable del área con el detalle del hallazgo</div></li>
+    </ul>
+    <span class="rec-tag">Alertas y seguimiento</span>
+  </div>
+
+  <div class="rec-card">
+    <div class="rec-num">08</div>
+    <div class="rec-title">Flujo Completo de Trabajo Diario Recomendado</div>
+    <div class="rec-text">Así debería verse el proceso optimizado de principio a fin:</div>
+    <div class="info-box sky" style="margin-top:12px;">
+      <div class="info-box-title">📋 Flujo diario ideal</div>
+      <div style="font-size:12px;color:var(--text2);line-height:2.2;">
+        <strong>🕗 Inicio del recorrido:</strong> Escanea QR del área → abre formulario en el celular<br>
+        <strong>🔍 Durante:</strong> Marca SI/NO/PARCIAL → agrega foto de hallazgos → observación<br>
+        <strong>💾 Al terminar el área:</strong> "Guardar Inspección" → "Enviar → ACPM"<br>
+        <strong>📊 Al terminar el recorrido:</strong> Dashboard → "Generar Informe" → enviar por correo a todos los procesos<br>
+        <strong>📧 Destinatarios reciben:</strong> Correo con KPIs, gráficas, tabla de pendientes y fotos de hallazgos<br>
+        <strong>🔄 Seguimiento:</strong> Los responsables actualizan el estado en la ACPM → Dashboard se actualiza automáticamente
+      </div>
+    </div>
+    <span class="rec-tag">Best Practice SG-SST · Res.0312/2019</span>
+  </div>
+</div>
+
+</main>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <div class="bottom-tab active" onclick="showSection('dashboard',this)" data-sec="dashboard"><div class="bottom-tab-icon">📊</div>Dashboard</div>
+  <div class="bottom-tab" onclick="showSection('inspeccion',this)" data-sec="inspeccion"><div class="bottom-tab-icon">🔍</div>Inspección</div>
+  <div class="bottom-tab" onclick="showSection('acpm',this)" data-sec="acpm"><div class="bottom-tab-icon">📋</div>ACPM</div>
+  <div class="bottom-tab" onclick="showSection('qr',this)" data-sec="qr"><div class="bottom-tab-icon">📷</div>QR</div>
+  <div class="bottom-tab" onclick="showSection('rec',this)" data-sec="rec"><div class="bottom-tab-icon">💡</div>Guía</div>
+</nav>
+
+<!-- MODAL ACPM -->
+<div class="overlay" id="acpmModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('acpmModal')">✕</button>
+    <div class="modal-title">Nuevo Reporte ACPM</div>
+    <div class="modal-sub">Registrar acto o condición insegura</div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Fecha *</label><input type="date" class="form-input" id="ma-fecha"></div><div class="form-group"><label class="form-label">Reportado Por *</label><input type="text" class="form-input" id="ma-rep" placeholder="Nombre"></div></div>
+    <div class="form-group"><label class="form-label">Área *</label><input type="text" class="form-input" id="ma-area" placeholder="Área"></div>
+    <div class="form-group"><label class="form-label">Tipo de Condición *</label>
+      <div class="select-wrap"><select class="form-select" id="ma-cond"><option value="">— Seleccionar —</option>
+        <option>Instalaciones Locativas</option><option>Instalaciones Eléctricas</option>
+        <option>Equipos o Herramientas</option><option>Equipos de Emergencias</option>
+        <option>Condicion de seguridad tecnologico</option><option>Riesgo mecanico</option>
+        <option>Riesgo fisico</option><option>Vehículos</option><option>EPPs</option>
+        <option>Orden y Aseo</option><option>Acto Inseguro</option>
+        <option>Auditoría</option>
+        <option>Autoevaluación Estándares Mínimos</option>
+        <option>Otros</option>
+      </select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Detalle *</label><textarea class="form-textarea" id="ma-det" placeholder="Descripción del hallazgo..."></textarea></div>
+    <div class="form-group"><label class="form-label">Clasificación del Riesgo *</label>
+      <div class="sev-grid">
+        <div class="sev-card" onclick="selSev('A',this)" id="sv-A"><div class="sev-class" style="color:#dc2626">A</div><div class="sev-name">GRAVE</div><div class="sev-time">0-24h</div></div>
+        <div class="sev-card" onclick="selSev('B',this)" id="sv-B"><div class="sev-class" style="color:#d97706">B</div><div class="sev-name">SERIA</div><div class="sev-time">1-30d</div></div>
+        <div class="sev-card" onclick="selSev('C',this)" id="sv-C"><div class="sev-class" style="color:#059669">C</div><div class="sev-name">LEVE</div><div class="sev-time">31-90d</div></div>
+      </div>
+    </div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Responsable</label><input type="text" class="form-input" id="ma-resp" placeholder="Área/Persona"></div><div class="form-group"><label class="form-label">Fecha Límite</label><input type="date" class="form-input" id="ma-lim"></div></div>
+    <div class="form-group"><label class="form-label">Plan de Acción</label><textarea class="form-textarea" id="ma-plan" placeholder="Acciones a tomar..." style="min-height:60px;"></textarea></div>
+    <div style="display:flex;gap:8px;margin-top:8px;"><button class="btn btn-secondary" style="flex:1" onclick="closeModal('acpmModal')">Cancelar</button><button class="btn btn-primary" style="flex:2" onclick="saveACPM()">💾 Guardar</button></div>
+  </div>
+</div>
+
+<!-- MODAL EMAIL -->
+<div class="overlay" id="emailModal">
+  <div class="modal" style="max-width:640px;">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('emailModal')">✕</button>
+    <div class="modal-title">📧 Informe Diario SG-SST</div>
+    <div class="modal-sub">Selecciona cómo quieres enviar el informe</div>
+
+    <div class="form-group"><label class="form-label">Para (destinatarios)</label>
+      <input type="text" class="form-input" id="emailTo" placeholder="sgsst@mainco.com.co">
+    </div>
+    <div class="form-group"><label class="form-label">Asunto</label>
+      <input type="text" class="form-input" id="emailSubject">
+    </div>
+
+    <!-- Preview pequeño -->
+    <div style="border:1.5px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;max-height:180px;overflow-y:auto;margin-bottom:16px;font-size:11px;">
+      <div id="emailPreviewContent"></div>
+    </div>
+
+    <!-- OPCIONES CLARAS -->
+    <div style="display:flex;flex-direction:column;gap:10px;">
+
+      <!-- OPCIÓN 1 — DESCARGA EML (mejor para Outlook) -->
+      <div style="background:#f0f9ff;border:2px solid #0284c7;border-radius:10px;padding:14px;">
+        <div style="font-weight:800;font-size:14px;color:#0284c7;margin-bottom:4px;">✅ OPCIÓN 1 — Mejor para Outlook</div>
+        <div style="font-size:12px;color:#334155;margin-bottom:10px;line-height:1.6;">
+          Descarga el archivo de correo y ábrelo con Outlook. El diseño queda perfecto.
+        </div>
+        <button class="btn btn-primary btn-block" onclick="downloadEML()" style="font-size:14px;padding:12px;">
+          📥 Descargar correo (.eml) → abrir con Outlook
+        </button>
+      </div>
+
+      <!-- OPCIÓN 2 — WHATSAPP -->
+      <div style="background:#f0fdf4;border:2px solid #16a34a;border-radius:10px;padding:14px;">
+        <div style="font-weight:800;font-size:14px;color:#16a34a;margin-bottom:4px;">📤 OPCIÓN 2 — Enviar por WhatsApp</div>
+        <div style="font-size:12px;color:#334155;margin-bottom:10px;line-height:1.6;">
+          Comparte el resumen con KPIs directamente por WhatsApp a uno o varios destinatarios.
+        </div>
+        <button class="btn btn-green btn-block" onclick="shareWhatsApp()" style="font-size:14px;padding:12px;">
+          📤 Enviar resumen por WhatsApp
+        </button>
+      </div>
+
+      <!-- OPCIÓN 3 — GMAIL web/celular -->
+      <div style="background:#fff7ed;border:2px solid #ea580c;border-radius:10px;padding:14px;">
+        <div style="font-weight:800;font-size:14px;color:#ea580c;margin-bottom:4px;">📋 OPCIÓN 3 — Gmail (web o celular)</div>
+        <div style="font-size:12px;color:#334155;margin-bottom:4px;line-height:1.6;">
+          1. Toca <strong>"Copiar informe"</strong><br>
+          2. Abre <strong>Gmail</strong> en el navegador (no la app)<br>
+          3. Nuevo correo → clic en el cuerpo → <strong>Ctrl+Shift+V</strong> (PC) o mantén presionado → <strong>"Pegar como HTML"</strong>
+        </div>
+        <button class="btn btn-orange btn-block" onclick="copyEmailHTML()" style="font-size:14px;padding:12px;">
+          📋 Copiar informe HTML
+        </button>
+        <div id="copyConfirm" style="display:none;font-size:11px;color:#16a34a;font-weight:700;text-align:center;margin-top:6px;">✅ ¡Copiado! Ahora ve a Gmail y pega con Ctrl+Shift+V</div>
+      </div>
+
+    </div>
+    <button class="btn btn-secondary btn-block" onclick="closeModal('emailModal')" style="margin-top:10px;">Cerrar</button>
+  </div>
+</div>
+
+<!-- MODAL FOTO GRANDE -->
+<div class="overlay" id="photoModal">
+  <div class="modal" style="max-width:500px;padding:16px;">
+    <div class="modal-handle"></div>
+    <img id="photoModalImg" style="width:100%;border-radius:8px;max-height:70vh;object-fit:contain;">
+    <div style="display:flex;gap:8px;margin-top:12px;"><button class="btn btn-secondary btn-block" onclick="closeModal('photoModal')">Cerrar</button></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><div class="toast-icon" id="toastIcon">✅</div><div><div class="toast-title" id="toastTitle"></div><div class="toast-sub" id="toastSub"></div></div></div>
+
+<script>
+// ════════ DATA ════════
+// Categorías CORREGIDAS: preguntas en positivo para Actos y Condiciones Inseguras
+const CATS = [
+  {id:'general', icon:'🏢', name:'Pasillos, Escaleras y Áreas Comunes', subs:[
+    {n:'Orden y Aseo', items:[
+      '¿Se observa organización y aseo en pasillos, escaleras y áreas comunes?',
+      '¿Se observa organización y aseo en los baños?',
+      '¿Los equipos e implementos están limpios e identificados?',
+    ]},
+    {n:'Condiciones Locativas', items:[
+      '¿El piso está en buen estado (sin rotos, huecos ni desniveles)?',
+      '¿Los pasamanos y accesos a escaleras están en buen estado?',
+      '¿Las vías de acceso están bien iluminadas y señalizadas?',
+      '¿Los pasillos están libres de obstáculos?',
+      '¿Los techos están libres de humedad, deterioro y grietas?',
+      '¿El sistema de ventilación o A/C está en buen estado de funcionamiento?',
+    ]},
+  ]},
+  {id:'oficinas', icon:'💻', name:'Oficinas y/o Bodegas', subs:[
+    {n:'Ergonomía y Carga Física', items:[
+      '¿La posición del monitor es adecuada?',
+      '¿La altura del monitor es igual a la de los ojos?',
+      '¿La altura del asiento permite codos a 90° sobre la mesa?',
+      '¿El ratón y teclado están a la misma altura con el antebrazo apoyado?',
+      '¿Los cables están organizados y canalizados?',
+    ]},
+    {n:'Almacenamiento', items:[
+      '¿Los materiales están correctamente almacenados y señalizados?',
+      '¿El apilamiento de materiales es seguro (altura máxima respetada)?',
+      '¿Los pasillos de bodega están libres de obstáculos?',
+    ]},
+  ]},
+  {id:'electrico', icon:'⚡', name:'Instalaciones Eléctricas', subs:[
+    {n:'Condiciones Eléctricas', items:[
+      '¿Los tableros eléctricos están identificados, señalizados y con acceso libre?',
+      '¿Los cables están organizados, canalizados y sin deterioro visible?',
+      '¿Los tomacorrientes e interruptores están en buen estado?',
+      '¿Las tomas múltiples están sin sobrecarga?',
+      '¿Las extensiones eléctricas son temporales y están en buen estado?',
+    ]},
+  ]},
+  {id:'epps', icon:'🦺', name:'Elementos de Protección Personal (EPPs)', subs:[
+    {n:'Uso y Estado de EPPs', items:[
+      '¿El personal usa los EPPs requeridos para su labor?',
+      '¿Los EPPs están en buen estado (sin deterioro, vigentes)?',
+      '¿Hay disponibilidad de EPPs en el área inspeccionada?',
+      '¿El personal conoce el uso correcto de sus EPPs?',
+      '¿Los cascos están identificados y en buen estado?',
+      '¿Las botas de seguridad son las adecuadas para la labor?',
+    ]},
+  ]},
+  {id:'emergencias', icon:'🚨', name:'Equipos de Emergencias', subs:[
+    {n:'Extintores', items:[
+      '¿Los extintores están en su sitio, señalizados y con acceso libre?',
+      '¿Los extintores tienen tarjeta de recarga vigente?',
+      '¿La demarcación del extintor en el piso está visible?',
+    ]},
+    {n:'Señalización y Evacuación', items:[
+      '¿Las rutas de evacuación están señalizadas y despejadas?',
+      '¿Las salidas de emergencia abren fácilmente hacia afuera?',
+      '¿Las lámparas de emergencia están funcionando?',
+      '¿El sistema de alarma (push, sirena, luz estroboscópica) funciona?',
+      '¿Los puntos de encuentro están señalizados?',
+    ]},
+  ]},
+  {id:'maquinas', icon:'⚙️', name:'Máquinas, Equipos y Herramientas', subs:[
+    {n:'Estado y Seguridad', items:[
+      '¿Las máquinas tienen sus guardas de seguridad instaladas?',
+      '¿Los botones de paro de emergencia son visibles y funcionales?',
+      '¿Las máquinas tienen señalización de riesgos?',
+      '¿Los operarios tienen capacitación certificada para el equipo?',
+      '¿Las herramientas manuales están en buen estado?',
+    ]},
+  ]},
+  {id:'actos', icon:'👁️', name:'Actos y Condiciones Inseguras Observadas', subs:[
+    // ✅ CORREGIDAS: preguntas en positivo — SI = Cumple (no hay acto/condición insegura)
+    {n:'Verificación de Actos Seguros', items:[
+      '¿Todo el personal usa correctamente los EPPs en zonas de riesgo?',
+      '¿Las posturas y esfuerzos del personal son adecuados y seguros?',
+      '¿El acceso a zonas restringidas está controlado y autorizado?',
+      '¿El uso de herramientas y equipos es el correcto y seguro?',
+    ]},
+    {n:'Verificación de Condiciones Seguras', items:[
+      '¿Las superficies de tránsito están limpias, secas y señalizadas?',
+      '¿No hay derrames de líquidos ni materiales sin contener o señalizar?',
+      '¿Los objetos en altura están asegurados y no representan riesgo de caída?',
+      '¿El área está libre de condiciones que puedan causar incendio o explosión?',
+    ]},
+  ]},
+];
+
+const CONDITION_TYPES = [
+  'Instalaciones Locativas','Instalaciones Eléctricas','Equipos o Herramientas',
+  'Equipos de Emergencias','Condicion de seguridad tecnologico','Riesgo mecanico',
+  'Riesgo fisico','Vehículos','EPPs','Orden y Aseo','Acto Inseguro',
+  'Auditoría','Autoevaluación Estándares Mínimos','Otros'
+];
+
+// ════════ DATOS BASE (solo se usan si no hay nada guardado) ════════
+const ACPM_DEFAULT = [
+  {n:1,fecha:'2022-03-16',reportado:'Alexandra Taquinas',area:'Zona Franca',condicion:'Condicion de seguridad tecnologico',detalle:'Barra antipánico bloqueada',clase:'A',severidad:'GRAVE',responsable:'Mantenimiento',estado:'CUMPLIDO',plan:'Mantenimiento realizado',fotos:[]},
+  {n:2,fecha:'2022-03-30',reportado:'Kelly Caicedo',area:'Cuarto de paquetes',condicion:'Instalaciones Eléctricas',detalle:'Cables sin canalizar en Mainco Health Care',clase:'B',severidad:'SERIA',responsable:'Mantenimiento',estado:'CUMPLIDO',plan:'Cambio de sede',fotos:[]},
+  {n:3,fecha:'2022-04-15',reportado:'Jaime Infante',area:'Planta principal',condicion:'Equipos o Herramientas',detalle:'Escalera de 5 peldaños en mal estado',clase:'B',severidad:'SERIA',responsable:'Mantenimiento/Compras',estado:'CUMPLIDO',plan:'Retirada de uso',fotos:[]},
+  {n:4,fecha:'2022-08-01',reportado:'Nismeth Gallego',area:'Main Corp 2° piso',condicion:'Condicion de seguridad tecnologico',detalle:'Pasador de corrediza averiado – riesgo caída al vacío',clase:'A',severidad:'GRAVE',responsable:'Mantenimiento',estado:'CUMPLIDO',plan:'Reparación inmediata',fotos:[]},
+  {n:5,fecha:'2023-07-20',reportado:'Coordinador SST',area:'Planta de Producción 1',condicion:'EPPs',detalle:'Operarios sin guantes en zona de corte',clase:'A',severidad:'GRAVE',responsable:'Jefe de Producción',estado:'CUMPLIDO',plan:'Dotación entregada y capacitación',fotos:[]},
+  {n:6,fecha:'2024-06-10',reportado:'Coordinador SST',area:'Tercer piso – módulo trabajo',condicion:'Instalaciones Locativas',detalle:'Humedad al ingreso del módulo de trabajo tercer piso',clase:'B',severidad:'SERIA',responsable:'Mantenimiento',estado:'EN PROCESO',plan:'Evaluación y presupuesto para impermeabilización',fotos:[]},
+  {n:7,fecha:'2025-01-15',reportado:'Coordinador SST',area:'Zona Franca – Producción',condicion:'Equipos de Emergencias',detalle:'Extintor vencido en área de producción',clase:'A',severidad:'GRAVE',responsable:'Compras',estado:'CUMPLIDO',plan:'Extintor recargado',fotos:[]},
+  {n:8,fecha:'2025-02-20',reportado:'Coordinador SST',area:'Planta de Producción',condicion:'Instalaciones Locativas',detalle:'Pisos en mal estado – riesgo de caída',clase:'B',severidad:'SERIA',responsable:'Mantenimiento',estado:'PENDIENTE',plan:'',fotos:[]},
+];
+
+// ════════ PERSISTENCIA localStorage ════════
+const LS_ACPM       = 'sgsst_acpm_v3';
+const LS_INSPECTIONS= 'sgsst_inspections_v3';
+
+function saveAll() {
+  try {
+    const acpmLite = acpmData.map(r => {
+      const {fotos, ...rest} = r;
+      return {...rest, fotosCount: (fotos||[]).length};
+    });
+    localStorage.setItem(LS_ACPM, JSON.stringify(acpmLite));
+    const inspsLite = inspections.map(i => {
+      const {fotos, items, ...rest} = i;
+      const itemsLite = (items||[]).map(it => {const {fotos:f,...ir}=it;return {...ir,fotosCount:(f||[]).length};});
+      return {...rest, items: itemsLite, fotosCount:(fotos||[]).length};
+    });
+    localStorage.setItem(LS_INSPECTIONS, JSON.stringify(inspsLite));
+    // Mostrar indicador de guardado
+    const ind = document.getElementById('saveIndicator');
+    if(ind){ind.style.display='';ind.textContent='💾 Guardado ✓';setTimeout(()=>{ind.style.display='none';},2500);}
+  } catch(e) {
+    console.warn('Error guardando:', e);
+    const ind = document.getElementById('saveIndicator');
+    if(ind){ind.style.display='';ind.textContent='⚠️ Error al guardar';setTimeout(()=>{ind.style.display='none';},3000);}
+  }
+}
+
+function loadAll() {
+  try {
+    const savedAcpm = localStorage.getItem(LS_ACPM);
+    if (savedAcpm) {
+      const parsed = JSON.parse(savedAcpm);
+      // Restaurar array fotos vacío si no existe
+      acpmData = parsed.map(r => ({...r, fotos: r.fotos || []}));
+    } else {
+      acpmData = JSON.parse(JSON.stringify(ACPM_DEFAULT));
+    }
+  } catch(e) {
+    acpmData = JSON.parse(JSON.stringify(ACPM_DEFAULT));
+  }
+  try {
+    const savedInsp = localStorage.getItem(LS_INSPECTIONS);
+    if (savedInsp) {
+      inspections = JSON.parse(savedInsp).map(i => ({...i, fotos: i.fotos||[], items:(i.items||[]).map(it=>({...it,fotos:it.fotos||[]}))}));
+    }
+  } catch(e) { inspections = []; }
+}
+
+// ════════ VARIABLES GLOBALES ════════
+let acpmData = JSON.parse(JSON.stringify(ACPM_DEFAULT));
+let inspections = [];
+let selSeverity = '';
+let acpmFilter = {status:'TODOS', clase:''};
+let sortCol = 'n', sortDir = 1;
+let photoStore = {};
+
+// ════════ INIT ════════
+document.addEventListener('DOMContentLoaded', () => {
+  // Cargar datos guardados PRIMERO
+  loadAll();
+
+  const now = new Date();
+  document.getElementById('currentDate').textContent = now.toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});
+  document.getElementById('dashDate').textContent = now.toLocaleDateString('es-CO',{day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('f-fecha').value = now.toISOString().split('T')[0];
+  document.getElementById('ma-fecha').value = now.toISOString().split('T')[0];
+  document.getElementById('emailSubject').value = `Informe Inspección SG-SST – ${now.toLocaleDateString('es-CO',{day:'numeric',month:'long',year:'numeric'})}`;
+  buildInspForm();
+  updateDashboard();
+  renderACPMTable();
+  updateInspSelect();
+  updateHistoryCard();
+  // Guardado automático cada 30 segundos
+  setInterval(saveAll, 30000);
+});
+
+// ════════ NAV ════════
+function showSection(id, tab) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.bottom-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  if (tab) tab.classList.add('active');
+  document.getElementById('progressStrip').style.display = id === 'inspeccion' ? 'flex' : 'none';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ════════ BUILD FORM ════════
+function buildInspForm() {
+  const c = document.getElementById('inspItems'); let h = '';
+  CATS.forEach(cat => {
+    h += `<div style="margin-bottom:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);">
+      <div class="cat-header" onclick="toggleCat('${cat.id}')">
+        <span>${cat.icon}</span><span style="flex:1">${cat.name}</span>
+        <span class="cat-score" id="sc-${cat.id}">—</span>
+        <span class="cat-toggle open" id="tog-${cat.id}">▶</span>
+      </div><div id="body-${cat.id}">`;
+    cat.subs.forEach(sub => {
+      h += `<div class="sub-header">${sub.n}</div>`;
+      sub.items.forEach((item, i) => {
+        const id = `${cat.id}_${i}_${sub.n.replace(/\W/g,'_')}`;
+        h += `<div class="insp-item" id="ii-${id}">
+          <div class="insp-item-text">${item}</div>
+          <div class="radio-row">
+            <div class="radio-btn" data-id="${id}" data-v="SI" onclick="pick('${id}','SI',this)">SI</div>
+            <div class="radio-btn" data-id="${id}" data-v="NO" onclick="pick('${id}','NO',this)">NO</div>
+            <div class="radio-btn" data-id="${id}" data-v="PARCIAL" onclick="pick('${id}','PARCIAL',this)">PARC</div>
+            <div class="radio-btn" data-id="${id}" data-v="NA" onclick="pick('${id}','NA',this)">N/A</div>
+          </div>
+          <input class="obs-input" id="ob-${id}" type="text" placeholder="Observación (especificar si NO o PARCIAL)...">
+          <div class="photo-section">
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">📷 Fotos del hallazgo</div>
+            <div class="photo-row" id="ph-${id}">
+              <div class="photo-add-btn" onclick="document.getElementById('pf-${id}').click()">+</div>
+              <input type="file" id="pf-${id}" class="photo-file-input" multiple accept="image/*" capture="environment" onchange="addPhotos(this,'ph-${id}','${id}')">
+            </div>
+          </div>
+        </div>`;
+      });
+    });
+    h += `</div></div>`;
+  });
+  c.innerHTML = h;
+}
+
+function toggleCat(id) {
+  const b = document.getElementById('body-'+id), t = document.getElementById('tog-'+id);
+  if (b.style.display === 'none') { b.style.display=''; t.classList.add('open'); }
+  else { b.style.display='none'; t.classList.remove('open'); }
+}
+
+function pick(id, val, btn) {
+  document.querySelectorAll(`[data-id="${id}"]`).forEach(b => b.className = 'radio-btn');
+  btn.className = `radio-btn sel-${val}`;
+  const row = document.getElementById('ii-'+id);
+  row.style.borderLeft = val==='NO'?'4px solid #dc2626':val==='PARCIAL'?'4px solid #d97706':val==='SI'?'4px solid #059669':'';
+  row.style.background = val==='NO'?'#fef2f2':val==='PARCIAL'?'#fffbeb':val==='SI'?'#f0fdf4':'';
+  updateProgress();
+}
+
+function updateProgress() {
+  const sel = document.querySelectorAll('.radio-btn[class*="sel-"]');
+  let si=0,no=0,parc=0;
+  sel.forEach(b => { if(b.className.includes('sel-SI'))si++; else if(b.className.includes('sel-NO'))no++; else if(b.className.includes('sel-PARCIAL'))parc++; });
+  const tot = si+no+parc, pct = tot>0?Math.round(si/tot*100):0;
+  document.getElementById('progFill').style.width = pct+'%';
+  document.getElementById('progPct').textContent = pct+'%';
+  const pNo = document.getElementById('pNo'), pParc = document.getElementById('pParc');
+  if(no>0){pNo.textContent=no+' NO';pNo.style.display='';}else pNo.style.display='none';
+  if(parc>0){pParc.textContent=parc+' PARC';pParc.style.display='';}else pParc.style.display='none';
+  CATS.forEach(cat => {
+    const cb = document.querySelectorAll(`#body-${cat.id} .radio-btn[class*="sel-"]`);
+    let cs=0,cn=0,cp=0;
+    cb.forEach(b=>{if(b.className.includes('sel-SI'))cs++;else if(b.className.includes('sel-NO'))cn++;else if(b.className.includes('sel-PARCIAL'))cp++;});
+    const ct=cs+cn+cp;
+    if(ct>0){const p=Math.round(cs/ct*100);const sc=document.getElementById('sc-'+cat.id);sc.textContent=p+'%';sc.style.background=p>=80?'rgba(5,150,105,.3)':p>=50?'rgba(217,119,6,.3)':'rgba(220,38,38,.3)';}
+  });
+}
+
+// ════════ PHOTOS ════════
+function addPhotos(input, containerId, itemId) {
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  if(!photoStore[itemId]) photoStore[itemId] = [];
+  Array.from(input.files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const dataURL = e.target.result;
+      photoStore[itemId].push(dataURL);
+      const img = document.createElement('img');
+      img.src = dataURL;
+      img.className = 'photo-thumb';
+      img.onclick = () => { document.getElementById('photoModalImg').src=dataURL; openModal('photoModal'); };
+      const addBtn = container.querySelector('.photo-add-btn');
+      container.insertBefore(img, addBtn);
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+// ════════ SAVE INSPECTION ════════
+function saveInspection() {
+  const fecha = document.getElementById('f-fecha').value;
+  const inspector = document.getElementById('f-inspector').value;
+  const area = document.getElementById('f-area').value;
+  const lugar = document.getElementById('f-lugar').value;
+  if(!fecha||!inspector||!area||!lugar){toast('⚠️','Campos requeridos','Completa fecha, inspector, sede y área');return;}
+
+  const items = [];
+  const sel = document.querySelectorAll('.radio-btn[class*="sel-"]');
+  let si=0,no=0,parc=0;
+  sel.forEach(b => {
+    if(b.className.includes('sel-SI'))si++;
+    else if(b.className.includes('sel-NO'))no++;
+    else if(b.className.includes('sel-PARCIAL'))parc++;
+    const id = b.dataset.id;
+    const row = document.getElementById('ii-'+id);
+    const txt = row?.querySelector('.insp-item-text')?.textContent||'';
+    const obs = document.getElementById('ob-'+id)?.value||'';
+    const val = b.dataset.v;
+    const fotos = photoStore[id]||[];
+    items.push({id, texto:txt, respuesta:val, obs, fotos});
+  });
+
+  const genPhotos = Array.from(document.querySelectorAll('#generalPhotos img.photo-thumb')).map(i=>i.src);
+
+  const record = {
+    id: Date.now(),
+    fecha, inspector, area, lugar,
+    cargo: document.getElementById('f-cargo').value,
+    proceso: document.getElementById('f-proceso').value,
+    si, no, parc,
+    total: si+no+parc,
+    pct: si+no+parc>0?Math.round(si/(si+no+parc)*100):0,
+    items,
+    fotos: genPhotos,
+    timestamp: new Date().toISOString()
+  };
+
+  inspections.push(record);
+  updateInspSelect();
+  updateHistoryCard();
+  updateDashboard();
+  saveAll();  // 💾 guardar inmediatamente
+  toast('✅','Inspección Guardada',`${si+no+parc} ítems · ${record.pct}% cumplimiento`);
+}
+
+function updateInspSelect() {
+  const sel = document.getElementById('inspSelectForEmail');
+  while(sel.options.length > 1) sel.remove(1);
+  inspections.forEach(r => {
+    const opt = document.createElement('option');
+    opt.value = r.id;
+    opt.textContent = `${r.fecha} — ${r.area} (${r.inspector}) — ${r.pct}% cumpl.`;
+    sel.add(opt);
+  });
+  if(inspections.length>0) sel.value = inspections[inspections.length-1].id;
+}
+
+function updateHistoryCard() {
+  const card = document.getElementById('inspHistoryCard');
+  const list = document.getElementById('inspHistoryList');
+  if(inspections.length===0){card.style.display='none';return;}
+  card.style.display='';
+  list.innerHTML = inspections.slice().reverse().map(r=>`
+    <div style="padding:12px;border-bottom:1px solid var(--sky-pale);display:flex;align-items:center;gap:10px;">
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;color:var(--text);">${r.fecha} — ${r.area}</div>
+        <div style="font-size:11px;color:var(--text3);">${r.inspector} · ${r.lugar} · ${r.total} ítems</div>
+      </div>
+      <div style="text-align:center;background:${r.pct>=80?'var(--green-bg)':r.pct>=50?'var(--yellow-bg)':'var(--red-bg)'};border-radius:8px;padding:6px 10px;min-width:52px;">
+        <div style="font-size:18px;font-weight:800;color:${r.pct>=80?'var(--green)':r.pct>=50?'var(--yellow)':'var(--red)'};">${r.pct}%</div>
+        <div style="font-size:9px;color:var(--text3);">CUMPL.</div>
+      </div>
+      <div style="font-size:10px;color:var(--red);font-weight:700;background:var(--red-bg);padding:4px 8px;border-radius:6px;">${r.no} NO</div>
+    </div>`).join('');
+}
+
+// ════════ SEND TO ACPM ════════
+function sendToACPM() {
+  const fecha = document.getElementById('f-fecha').value;
+  const inspector = document.getElementById('f-inspector').value;
+  const area = document.getElementById('f-area').value;
+  if(!fecha||!inspector||!area){toast('⚠️','Campos requeridos','Completa fecha, inspector y área primero');return;}
+  const noBtns = document.querySelectorAll('.radio-btn.sel-NO');
+  const parcBtns = document.querySelectorAll('.radio-btn.sel-PARCIAL');
+  let added = 0;
+  const maxN = acpmData.length>0?Math.max(...acpmData.map(r=>r.n)):0;
+  const process = (btns, cls) => {
+    btns.forEach(btn => {
+      const id = btn.dataset.id;
+      const row = document.getElementById('ii-'+id);
+      const txt = row?.querySelector('.insp-item-text')?.textContent||'Hallazgo de inspección';
+      const obs = document.getElementById('ob-'+id)?.value||'';
+      const fotos = photoStore[id]||[];
+      acpmData.push({n:maxN+added+1,fecha,reportado:inspector,area,condicion:'Inspección de Seguridad',
+        detalle:txt+(obs?' | '+obs:''),
+        clase:cls==='NO'?'B':'C',severidad:cls==='NO'?'SERIA':'LEVE',
+        responsable:'',estado:'PENDIENTE',plan:'',fotos});
+      added++;
+    });
+  };
+  process(noBtns,'NO');process(parcBtns,'PARCIAL');
+  if(added>0){
+    saveAll();  // 💾 guardar inmediatamente
+    toast('🔗',`${added} hallazgos → ACPM`,'Registrados con estado PENDIENTE');
+    updateDashboard();renderACPMTable();
+  }
+  else toast('ℹ️','Sin hallazgos','No hay ítems NO o PARCIAL para enviar');
+}
+
+function clearForm() {
+  document.querySelectorAll('.radio-btn').forEach(b=>b.className='radio-btn');
+  document.querySelectorAll('.obs-input').forEach(i=>i.value='');
+  document.querySelectorAll('.insp-item').forEach(r=>{r.style.borderLeft='';r.style.background='';});
+  ['f-inspector','f-cargo','f-area'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('f-lugar').value='';document.getElementById('f-proceso').value='';
+  document.getElementById('f-fecha').value=new Date().toISOString().split('T')[0];
+  photoStore={};
+  document.querySelectorAll('.photo-row img.photo-thumb').forEach(i=>i.remove());
+  updateProgress();toast('🗑️','Formulario limpiado','Listo para nueva inspección');
+}
+
+// ════════ DASHBOARD ════════
+function updateDashboard() {
+  const total=acpmData.length,cum=acpmData.filter(r=>r.estado==='CUMPLIDO').length,
+    proc=acpmData.filter(r=>r.estado==='EN PROCESO').length,
+    pend=acpmData.filter(r=>r.estado==='PENDIENTE').length,
+    grav=acpmData.filter(r=>r.clase==='A').length,ef=total>0?Math.round(cum/total*100):0;
+  ani('kpi-total',total);ani('kpi-cum',cum);ani('kpi-proc',proc);ani('kpi-pend',pend);ani('kpi-grv',grav);
+  document.getElementById('kpi-ef').textContent=ef+'%';document.getElementById('donut-ef').textContent=ef+'%';
+  const cA=acpmData.filter(r=>r.clase==='A').length,cB=acpmData.filter(r=>r.clase==='B').length,cC=acpmData.filter(r=>r.clase==='C').length;
+  document.getElementById('leg-A').textContent=cA;document.getElementById('leg-B').textContent=cB;document.getElementById('leg-C').textContent=cC;
+  const circ=238.7;
+  setTimeout(()=>{
+    const pA=total>0?(cA/total)*circ:0,pB=total>0?(cB/total)*circ:0,pC=total>0?(cC/total)*circ:0;
+    document.getElementById('d-A').setAttribute('stroke-dasharray',`${pA} ${circ-pA}`);
+    document.getElementById('d-B').setAttribute('stroke-dasharray',`${pB} ${circ-pB}`);document.getElementById('d-B').setAttribute('stroke-dashoffset',`${-pA}`);
+    document.getElementById('d-C').setAttribute('stroke-dasharray',`${pC} ${circ-pC}`);document.getElementById('d-C').setAttribute('stroke-dashoffset',`${-(pA+pB)}`);
+  },200);
+  const cc={};acpmData.forEach(r=>{cc[r.condicion]=(cc[r.condicion]||0)+1;});
+  const sorted=Object.entries(cc).sort((a,b)=>b[1]-a[1]).slice(0,7);const mx=sorted[0]?.[1]||1;
+  const bc=['#0ea5e9','#059669','#d97706','#dc2626','#7c3aed','#ea580c','#0891b2'];
+  document.getElementById('condBar').innerHTML=sorted.map(([k,v],i)=>`<div class="bar-row"><div class="bar-label" title="${k}">${k}</div><div class="bar-track"><div class="bar-fill" style="width:${v/mx*100}%;background:${bc[i%bc.length]}"></div></div><div class="bar-val">${v}</div></div>`).join('');
+  const yc={};acpmData.forEach(r=>{const y=r.fecha?.substring(0,4);if(y)yc[y]=(yc[y]||0)+1;});
+  const ys=Object.entries(yc).sort((a,b)=>a[0].localeCompare(b[0]));const my=ys.reduce((m,[,v])=>Math.max(m,v),1);
+  document.getElementById('anoBar').innerHTML=ys.map(([y,v])=>`<div class="bar-row"><div class="bar-label">${y}</div><div class="bar-track"><div class="bar-fill" style="width:${v/my*100}%;background:var(--sky)"></div></div><div class="bar-val">${v}</div></div>`).join('');
+  const ac=total>0?Math.round(acpmData.filter(r=>r.responsable).length/total*100):0;
+  document.getElementById('indTable').innerHTML=[
+    ['Eficacia Cierre','≥ 80%',ef+'%',ef>=80?'🟢':ef>=60?'🟡':'🔴'],
+    ['Hallazgos Clase A','≤ 5%',total>0?Math.round(grav/total*100)+'%':'0%',total>0&&grav/total*100<=5?'🟢':'🔴'],
+    ['Acciones Correctivas','≥ 90%',ac+'%',ac>=90?'🟢':ac>=70?'🟡':'🔴'],
+    ['Cumplimiento SG-SST','≥ 85%',ef+'%',ef>=85?'🟢':'🔴'],
+    ['Reporte Activo','≥ 1/mes','✓ Activo','🟢'],
+  ].map(([n,m,r,i])=>`<tr><td class="ind-name">${n}</td><td class="ind-meta">${m}</td><td class="ind-res">${r}</td><td style="text-align:center;font-size:16px;">${i}</td></tr>`).join('');
+  document.getElementById('dashTbody').innerHTML=acpmData.slice(-8).reverse().map(r=>`<tr>
+    <td style="font-family:'JetBrains Mono',monospace;color:var(--text3);font-size:11px;">${r.n}</td>
+    <td title="${r.area}" style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(r.area||'—').substring(0,18)}</td>
+    <td title="${r.detalle}" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(r.detalle||'—').substring(0,35)}${r.detalle?.length>35?'...':''}</td>
+    <td><span class="badge badge-${r.clase}">${r.clase}</span></td>
+    <td><span class="badge badge-${r.estado?.replace(/\s/g,'_')}">${r.estado}</span></td>
+  </tr>`).join('');
+}
+
+function ani(id,target){const el=document.getElementById(id);if(!el)return;let c=0;const s=Math.max(1,Math.ceil(target/15));const t=setInterval(()=>{c=Math.min(c+s,target);el.textContent=c;if(c>=target)clearInterval(t);},50);}
+
+// ════════ ACPM TABLE ════════
+function renderACPMTable() {
+  let data=[...acpmData];
+  const q=(document.getElementById('acpmSearch')?.value||'').toLowerCase();
+  if(q) data=data.filter(r=>(r.detalle+r.area+r.condicion+r.reportado).toLowerCase().includes(q));
+  if(acpmFilter.status!=='TODOS') data=data.filter(r=>r.estado===acpmFilter.status);
+  if(acpmFilter.clase) data=data.filter(r=>r.clase===acpmFilter.clase);
+  data.sort((a,b)=>{let va=a[sortCol],vb=b[sortCol];if(typeof va==='string')va=va.toLowerCase();if(typeof vb==='string')vb=vb.toLowerCase();return sortDir*(va>vb?1:va<vb?-1:0);});
+  document.getElementById('acpmCount').textContent=data.length;
+  document.getElementById('acpmTbody').innerHTML=data.map(r=>`<tr>
+    <td style="font-family:'JetBrains Mono',monospace;color:var(--text3);">${r.n}</td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:11px;white-space:nowrap;">${r.fecha||'—'}</td>
+    <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${r.area}">${(r.area||'—').substring(0,18)}</td>
+    <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${r.detalle}">${(r.detalle||'—').substring(0,40)}${r.detalle?.length>40?'...':''}</td>
+    <td><span class="badge badge-${r.clase}">${r.clase}</span></td>
+    <td><span class="badge badge-${r.estado?.replace(/\s/g,'_')}">${r.estado||'—'}</span></td>
+    <td><button onclick="cycleSt(${r.n})" style="background:none;border:none;cursor:pointer;font-size:16px;" title="Cambiar estado">🔄</button></td>
+  </tr>`).join('')||'<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:20px;">Sin registros</td></tr>';
+}
+
+function setFilter(val,el){acpmFilter.status=val;document.querySelectorAll('.filters .filter-chip:not([id^="fc"])').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderACPMTable();}
+function toggleClass(cls,el){acpmFilter.clase=acpmFilter.clase===cls?'':cls;['A','B','C'].forEach(c=>{const e=document.getElementById('fc-'+c);e.className='filter-chip';if(acpmFilter.clase===c)e.className='filter-chip '+(c==='A'?'fc-red':c==='B'?'fc-yellow':'fc-green');});renderACPMTable();}
+function sort(col){if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=1;}renderACPMTable();}
+function cycleSt(n){
+  const r=acpmData.find(x=>x.n===n);
+  if(!r)return;
+  const st=['PENDIENTE','EN PROCESO','CUMPLIDO'];
+  r.estado=st[(st.indexOf(r.estado)+1)%3];
+  saveAll();  // 💾 guardar inmediatamente
+  renderACPMTable();
+  updateDashboard();
+  toast('🔄',`Registro #${n} guardado`,`Estado → ${r.estado}`);
+}
+function exportCSV(){let csv='N°,Fecha,Reportado Por,Área,Condición,Detalle,Clase,Severidad,Responsable,Estado,Plan\n';acpmData.forEach(r=>csv+=`${r.n},"${r.fecha}","${r.reportado}","${r.area}","${r.condicion}","${r.detalle}",${r.clase},${r.severidad||''},"${r.responsable}",${r.estado},"${r.plan}"\n`);const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));a.download=`ACPM_SG-SST_${new Date().toISOString().split('T')[0]}.csv`;a.click();toast('📥','Exportado','Archivo CSV descargado');}
+
+// ════════ ACPM MODAL ════════
+function openNewACPM(){selSeverity='';['ma-rep','ma-area','ma-det','ma-resp','ma-plan'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});document.getElementById('ma-cond').value='';document.getElementById('ma-lim').value='';document.getElementById('ma-fecha').value=new Date().toISOString().split('T')[0];document.querySelectorAll('.sev-card').forEach(c=>c.className='sev-card');openModal('acpmModal');}
+function selSev(s,el){selSeverity=s;document.querySelectorAll('.sev-card').forEach(c=>c.className='sev-card');if(el)el.className=`sev-card sel-${s}`;}
+function saveACPM(){
+  const fecha=document.getElementById('ma-fecha').value,rep=document.getElementById('ma-rep').value,area=document.getElementById('ma-area').value,det=document.getElementById('ma-det').value,cond=document.getElementById('ma-cond').value;
+  if(!fecha||!rep||!area||!det||!cond||!selSeverity){toast('⚠️','Campos requeridos','Completa todos los campos y la clasificación');return;}
+  const sv={A:{sev:'GRAVE'},B:{sev:'SERIA'},C:{sev:'LEVE'}};const maxN=acpmData.length>0?Math.max(...acpmData.map(r=>r.n)):0;
+  acpmData.push({n:maxN+1,fecha,reportado:rep,area,condicion:cond,detalle:det,clase:selSeverity,severidad:sv[selSeverity].sev,responsable:document.getElementById('ma-resp').value,plan:document.getElementById('ma-plan').value,estado:'PENDIENTE',fotos:[]});
+  saveAll();  // 💾 guardar inmediatamente
+  closeModal('acpmModal');renderACPMTable();updateDashboard();toast('✅',`Reporte #${maxN+1} guardado`,`Clase ${selSeverity}`);
+}
+
+// ════════ EMAIL ════════
+function openEmailModal(){
+  const selId = document.getElementById('inspSelectForEmail')?.value;
+  const insp = selId==='all'||!selId ? null : inspections.find(i=>i.id==selId);
+  generateEmail(insp);
+  openModal('emailModal');
+}
+
+function generateEmail(insp) {
+  const now=new Date();
+  const total=acpmData.length,cum=acpmData.filter(r=>r.estado==='CUMPLIDO').length,
+    proc=acpmData.filter(r=>r.estado==='EN PROCESO').length,
+    pend=acpmData.filter(r=>r.estado==='PENDIENTE').length,
+    grav=acpmData.filter(r=>r.clase==='A').length,ef=total>0?Math.round(cum/total*100):0;
+  const dateStr=now.toLocaleDateString('es-CO',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const pendList=acpmData.filter(r=>r.estado==='PENDIENTE'||r.estado==='EN PROCESO');
+  const cc={};acpmData.forEach(r=>{cc[r.condicion]=(cc[r.condicion]||0)+1;});
+  const topC=Object.entries(cc).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const bc=['#0ea5e9','#059669','#d97706','#dc2626','#7c3aed'];
+
+  let inspSection = '';
+  if(insp) {
+    const fotosHtml = insp.fotos.length>0?`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">${insp.fotos.map(f=>`<img src="${f}" style="width:80px;height:80px;border-radius:6px;object-fit:cover;border:1px solid #bae6fd;">`).join('')}</div>`:'';
+    const hallazgos = insp.items.filter(i=>i.respuesta==='NO'||i.respuesta==='PARCIAL');
+    inspSection = `<div style="background:white;padding:20px 24px;border:1px solid #bae6fd;border-top:none;">
+      <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">🔍 Inspección del Día — ${insp.fecha}</div>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:12px;">
+        <tr><td style="font-size:12px;color:#64748b;padding:3px 0;width:100px;">Inspector:</td><td style="font-size:12px;color:#0c1a2e;font-weight:600;">${insp.inspector}</td></tr>
+        <tr><td style="font-size:12px;color:#64748b;padding:3px 0;">Área:</td><td style="font-size:12px;color:#0c1a2e;font-weight:600;">${insp.area} — ${insp.lugar}</td></tr>
+        <tr><td style="font-size:12px;color:#64748b;padding:3px 0;">Cumplimiento:</td><td style="font-size:16px;font-weight:800;color:${insp.pct>=80?'#059669':insp.pct>=50?'#d97706':'#dc2626'};">${insp.pct}%</td></tr>
+        <tr><td style="font-size:12px;color:#64748b;padding:3px 0;">Ítems:</td><td style="font-size:12px;color:#0c1a2e;">${insp.si} SI · <span style="color:#dc2626;font-weight:700;">${insp.no} NO</span> · <span style="color:#d97706;font-weight:700;">${insp.parc} PARCIAL</span></td></tr>
+      </table>
+      ${fotosHtml}
+      ${hallazgos.length>0?`<div style="margin-top:14px;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Hallazgos de la Inspección</div>
+      ${hallazgos.map(h=>{const fots=h.fotos&&h.fotos.length>0?`<div style="display:flex;gap:6px;margin-top:6px;">${h.fotos.map(f=>`<img src="${f}" style="width:60px;height:60px;border-radius:4px;object-fit:cover;border:1px solid #fecaca;">`).join('')}</div>`:'';return `<div style="background:${h.respuesta==='NO'?'#fef2f2':'#fffbeb'};border-left:3px solid ${h.respuesta==='NO'?'#dc2626':'#d97706'};padding:10px 12px;border-radius:0 6px 6px 0;margin-bottom:8px;">
+        <div style="font-size:12px;color:#0c1a2e;font-weight:600;">${h.texto}</div>
+        <div style="font-size:11px;color:${h.respuesta==='NO'?'#dc2626':'#d97706'};font-weight:700;margin-top:3px;">${h.respuesta}${h.obs?' — '+h.obs:''}</div>
+        ${fots}
+      </div>`;}).join('')}`:''}
+    </div>`;
+  }
+
+  const html=`<div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto;background:#f0f9ff;">
+<div style="background:linear-gradient(135deg,#0ea5e9,#0284c7);padding:28px 24px 20px;border-radius:12px 12px 0 0;">
+  <div style="color:rgba(255,255,255,.8);font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">INFORME DIARIO · SG-SST</div>
+  <div style="color:white;font-size:20px;font-weight:800;margin-bottom:4px;">Inspección de Higiene y Seguridad Industrial</div>
+  <div style="color:rgba(255,255,255,.85);font-size:13px;">${dateStr}</div>
+</div>
+<div style="background:white;padding:20px 24px;border:1px solid #bae6fd;border-top:none;">
+  <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">📊 KPIs Acumulados</div>
+  <table style="width:100%;border-collapse:collapse;"><tr>
+    <td style="padding:10px 4px;text-align:center;background:#f0f9ff;border-radius:8px;border:1px solid #bae6fd;"><div style="font-size:24px;font-weight:800;color:#0284c7;">${total}</div><div style="font-size:9px;color:#64748b;font-weight:600;text-transform:uppercase;">Total</div></td>
+    <td style="width:8px;"></td>
+    <td style="padding:10px 4px;text-align:center;background:#ecfdf5;border-radius:8px;border:1px solid #a7f3d0;"><div style="font-size:24px;font-weight:800;color:#059669;">${cum}</div><div style="font-size:9px;color:#64748b;font-weight:600;text-transform:uppercase;">✅ Cerrados</div></td>
+    <td style="width:8px;"></td>
+    <td style="padding:10px 4px;text-align:center;background:#fef2f2;border-radius:8px;border:1px solid #fecaca;"><div style="font-size:24px;font-weight:800;color:#dc2626;">${pend}</div><div style="font-size:9px;color:#64748b;font-weight:600;text-transform:uppercase;">🔴 Pendiente</div></td>
+    <td style="width:8px;"></td>
+    <td style="padding:10px 4px;text-align:center;background:${ef>=80?'#ecfdf5':'#fef2f2'};border-radius:8px;border:1px solid ${ef>=80?'#a7f3d0':'#fecaca'};"><div style="font-size:24px;font-weight:800;color:${ef>=80?'#059669':'#dc2626'};">${ef}%</div><div style="font-size:9px;color:#64748b;font-weight:600;text-transform:uppercase;">🎯 Eficacia</div></td>
+  </tr></table>
+</div>
+${inspSection}
+${pendList.length>0?`<div style="background:white;padding:20px 24px;border:1px solid #bae6fd;border-top:none;">
+  <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">⚠️ Acciones Pendientes (${pendList.length})</div>
+  <table style="width:100%;border-collapse:collapse;">
+  <tr style="background:#fef2f2;"><th style="padding:7px 8px;text-align:left;font-size:9px;color:#64748b;text-transform:uppercase;">Área</th><th style="padding:7px 8px;text-align:left;font-size:9px;color:#64748b;text-transform:uppercase;">Hallazgo</th><th style="padding:7px;text-align:center;font-size:9px;color:#64748b;text-transform:uppercase;width:40px;">Cls</th><th style="padding:7px;text-align:center;font-size:9px;color:#64748b;text-transform:uppercase;width:65px;">Estado</th></tr>
+  ${pendList.slice(0,10).map(r=>`<tr style="border-top:1px solid #fee2e2;"><td style="padding:7px 8px;font-size:11px;color:#334155;">${(r.area||'').substring(0,20)}</td><td style="padding:7px 8px;font-size:11px;color:#334155;">${(r.detalle||'').substring(0,40)}${r.detalle?.length>40?'...':''}</td><td style="padding:7px;text-align:center;"><span style="background:${r.clase==='A'?'#fef2f2':r.clase==='B'?'#fffbeb':'#ecfdf5'};color:${r.clase==='A'?'#dc2626':r.clase==='B'?'#d97706':'#059669'};border:1px solid ${r.clase==='A'?'#fecaca':r.clase==='B'?'#fde68a':'#a7f3d0'};padding:2px 6px;border-radius:20px;font-size:9px;font-weight:700;">${r.clase}</span></td><td style="padding:7px;text-align:center;font-size:10px;color:${r.estado==='PENDIENTE'?'#dc2626':'#d97706'};font-weight:700;">${r.estado}</td></tr>`).join('')}
+  </table>
+</div>`:''}
+<div style="background:#0284c7;padding:14px 24px;border-radius:0 0 12px 12px;">
+  <div style="color:white;font-size:12px;font-weight:700;">Sistema de Gestión SG-SST · FO-THU-30 / FO-THU-45</div>
+  <div style="color:rgba(255,255,255,.7);font-size:10px;">Coordinación de Seguridad y Salud en el Trabajo · Generado automáticamente</div>
+</div></div>`;
+
+  document.getElementById('emailPreviewContent').innerHTML=html;
+  window._emailHTML=html;
+}
+
+function openMailClient(){
+  const to = document.getElementById('emailTo').value;
+  const subj = encodeURIComponent(document.getElementById('emailSubject').value);
+  window.open(`mailto:${to}?subject=${subj}`, '_blank');
+}
+
+// ── DESCARGA ARCHIVO .EML — abre perfecto en Outlook ──
+function downloadEML() {
+  const to      = document.getElementById('emailTo').value || '';
+  const subject = document.getElementById('emailSubject').value || 'Informe SG-SST';
+  const html    = window._emailHTML || '<p>Sin datos</p>';
+
+  // Formato MIME para archivo .eml
+  const boundary = 'boundary_sgsst_' + Date.now();
+  const eml = [
+    'MIME-Version: 1.0',
+    `To: ${to}`,
+    `Subject: =?UTF-8?B?${btoa(unescape(encodeURIComponent(subject)))}?=`,
+    `Content-Type: multipart/alternative; boundary="${boundary}"`,
+    '',
+    `--${boundary}`,
+    'Content-Type: text/plain; charset=UTF-8',
+    'Content-Transfer-Encoding: quoted-printable',
+    '',
+    'Informe SG-SST - Ver version HTML para el diseño completo.',
+    '',
+    `--${boundary}`,
+    'Content-Type: text/html; charset=UTF-8',
+    'Content-Transfer-Encoding: base64',
+    '',
+    // Codificar el HTML en base64 en chunks de 76 chars
+    btoa(unescape(encodeURIComponent(html))).match(/.{1,76}/g).join('\r\n'),
+    '',
+    `--${boundary}--`,
+  ].join('\r\n');
+
+  const blob = new Blob([eml], {type: 'message/rfc822'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `Informe_SGSST_${new Date().toISOString().split('T')[0]}.eml`;
+  a.click();
+  toast('📥','Archivo descargado','Abre el archivo .eml con Outlook — el diseño quedará perfecto');
+}
+
+function shareWhatsApp() {
+  const now = new Date();
+  const total = acpmData.length;
+  const cum   = acpmData.filter(r=>r.estado==='CUMPLIDO').length;
+  const proc  = acpmData.filter(r=>r.estado==='EN PROCESO').length;
+  const pend  = acpmData.filter(r=>r.estado==='PENDIENTE').length;
+  const efic  = total>0?Math.round(cum/total*100):0;
+  const claseA= acpmData.filter(r=>r.clase==='A'&&r.estado!=='CUMPLIDO').length;
+  const fecha = now.toLocaleDateString('es-CO',{day:'numeric',month:'long',year:'numeric'});
+
+  const pendList = acpmData.filter(r=>r.estado!=='CUMPLIDO').slice(0,5)
+    .map(r=>`• [${r.clase}] ${r.area}: ${r.detalle.substring(0,45)} → *${r.estado}*`)
+    .join('\n');
+
+  const msg =
+    `📊 *INFORME SG-SST — ${fecha}*\n\n` +
+    `🏢 Main Corporation / Mainco Health Care SAS\n` +
+    `━━━━━━━━━━━━━━━━━━━━\n` +
+    `✅ Cerrados: *${cum}* de ${total} (${efic}% eficacia)\n` +
+    `⏳ En proceso: *${proc}*\n` +
+    `🔴 Pendientes: *${pend}*\n` +
+    `⚠️ Clase A activos: *${claseA}*\n` +
+    `━━━━━━━━━━━━━━━━━━━━\n` +
+    (pendList ? `📋 *Pendientes:*\n${pendList}\n\n` : '') +
+    `_SG-SST · Coordinación Seguridad y Salud en el Trabajo_`;
+
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+  toast('📤','Abriendo WhatsApp','El resumen está listo para enviar');
+}
+
+function copyEmailHTML(){
+  const html = window._emailHTML || '';
+  if(!html){ toast('⚠️','Sin datos','Genera el informe primero'); return; }
+
+  const showConfirm = () => {
+    const c = document.getElementById('copyConfirm');
+    if(c){ c.style.display=''; setTimeout(()=>c.style.display='none', 4000); }
+    toast('📋','¡Copiado!','Ve a Gmail en el navegador → Nuevo correo → Ctrl+Shift+V');
+  };
+
+  // Intentar copiar como HTML rico
+  if(navigator.clipboard && window.ClipboardItem) {
+    try {
+      const item = new ClipboardItem({
+        'text/html':  new Blob([html], {type:'text/html'}),
+        'text/plain': new Blob([html.replace(/<[^>]+>/g,'')], {type:'text/plain'})
+      });
+      navigator.clipboard.write([item]).then(showConfirm).catch(()=>copyPlain(html, showConfirm));
+    } catch(e) { copyPlain(html, showConfirm); }
+  } else {
+    copyPlain(html, showConfirm);
+  }
+}
+
+function copyPlain(html, cb) {
+  // Fallback: copiar texto plano
+  const ta = document.createElement('textarea');
+  ta.value = html;
+  ta.style.cssText = 'position:fixed;top:-9999px;opacity:0;';
+  document.body.appendChild(ta);
+  ta.select(); ta.setSelectionRange(0, 99999);
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  if(cb) cb();
+}
+
+// ════════ ADMIN UTILITIES ════════
+function exportAndBackup() {
+  const backup = { acpmData, inspections, exportDate: new Date().toISOString(), version: 'v3' };
+  const json = JSON.stringify(backup, null, 2);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([json], {type:'application/json'}));
+  a.download = `SGSST_Backup_${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  toast('💾','Respaldo exportado','Guarda el archivo JSON en un lugar seguro');
+}
+
+function resetToDefault() {
+  if(!confirm('¿Restablecer todos los datos al estado inicial? Se perderán los cambios no exportados.')) return;
+  localStorage.removeItem(LS_ACPM);
+  localStorage.removeItem(LS_INSPECTIONS);
+  acpmData = JSON.parse(JSON.stringify(ACPM_DEFAULT));
+  inspections = [];
+  updateDashboard();
+  renderACPMTable();
+  updateInspSelect();
+  updateHistoryCard();
+  toast('🔄','Datos restablecidos','Se cargaron los datos base originales');
+}
+
+// ════════ ADMIN GUIDE TOGGLE ════════
+function toggleAdminGuide() {
+  const section = document.getElementById('adminGuideSection');
+  const btn = document.getElementById('adminGuideBtn');
+  if(section.style.display === 'none') {
+    section.style.display = '';
+    btn.textContent = '🔒 Ocultar guía de administración';
+    btn.className = 'btn btn-orange btn-sm';
+  } else {
+    section.style.display = 'none';
+    btn.textContent = '🔧 Ver guía de administración (solo admin)';
+    btn.className = 'btn btn-secondary btn-sm';
+  }
+}
+
+// roundRect polyfill para Chrome/Safari antiguos
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
+    if(w<2*r)r=w/2;if(h<2*r)r=h/2;
+    this.beginPath();this.moveTo(x+r,y);
+    this.arcTo(x+w,y,x+w,y+h,r);this.arcTo(x+w,y+h,x,y+h,r);
+    this.arcTo(x,y+h,x,y,r);this.arcTo(x,y,x+w,y,r);this.closePath();
+    return this;
+  };
+}
+
+// ════════ QR GENERATOR — Tarjeta con foto ════════
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
+    if(w<2*r)r=w/2;if(h<2*r)r=h/2;
+    this.beginPath();this.moveTo(x+r,y);
+    this.arcTo(x+w,y,x+w,y+h,r);this.arcTo(x+w,y+h,x,y+h,r);
+    this.arcTo(x,y+h,x,y,r);this.arcTo(x,y,x+w,y,r);this.closePath();
+    return this;
+  };
+}
+
+// ════════ QR GENERATOR — Tarjeta con foto ════════
+let qrPhotoDataURL = null;
+
+function updateQRLabel(){
+  const t=document.getElementById('qr-tipo').value;
+  const l=document.getElementById('qr-label-lbl');
+  const labels={area:'Nombre del Área',maquina:'Nombre/ID de la Máquina',proceso:'Nombre del Proceso',vehiculo:'Placa o ID del Vehículo',extintor:'ID del Extintor',ruta:'Nombre de la Ruta',custom:'Identificación'};
+  l.innerHTML=(labels[t]||'Nombre / Identificación')+' <span class="req">*</span>';
+}
+
+function loadQRPhoto(input) {
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    qrPhotoDataURL = e.target.result;
+    const prev = document.getElementById('qrPhotoPreview');
+    prev.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = qrPhotoDataURL;
+    img.style.cssText = 'width:80px;height:80px;object-fit:cover;border-radius:6px;';
+    prev.appendChild(img);
+    toast('📸','Foto cargada','Se incluirá en la tarjeta del QR');
+  };
+  reader.readAsDataURL(file);
+}
+
+function generateQR() {
+  const tipo   = document.getElementById('qr-tipo').value;
+  const nombre = document.getElementById('qr-nombre').value.trim();
+  const info   = document.getElementById('qr-info').value.trim();
+  const url    = document.getElementById('qr-url').value.trim();
+  if(!tipo||!nombre){toast('⚠️','Campos requeridos','Selecciona el tipo e ingresa el nombre');return;}
+  if(!url){toast('⚠️','URL requerida','Ingresa la URL de GitHub Pages');return;}
+
+  document.getElementById('qrUrlDisplay').textContent = url;
+  document.getElementById('qrResultCard').style.display = '';
+
+  // Cargar QR como imagen desde la API pública
+  const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}&format=png&margin=8&color=2-66-147`;
+  const qrImg = new Image(); qrImg.crossOrigin = 'anonymous';
+  qrImg.onload = () => {
+    renderQRCard(qrImg, nombre, info, tipo, url);
+    toast('✅','QR generado','Listo para descargar e imprimir');
+    document.getElementById('qrResultCard').scrollIntoView({behavior:'smooth'});
+  };
+  qrImg.onerror = () => {
+    // Fallback sin internet: dibujar texto indicativo
+    const canvas = document.getElementById('qrPrintCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width=320; canvas.height=420;
+    ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,320,420);
+    ctx.fillStyle='#dc2626'; ctx.font='bold 14px Arial'; ctx.textAlign='center';
+    ctx.fillText('Sin conexión a internet', 160, 210);
+    ctx.fillStyle='#64748b'; ctx.font='12px Arial';
+    ctx.fillText('Conéctate y genera el QR de nuevo', 160, 235);
+    document.getElementById('qrResultCard').scrollIntoView({behavior:'smooth'});
+    toast('⚠️','Sin internet','Necesitas conexión para generar el QR');
+  };
+  qrImg.src = qrApiUrl;
+}
+
+function renderQRCard(qrImg, nombre, info, tipo, url) {
+  const canvas = document.getElementById('qrPrintCanvas');
+  const ctx = canvas.getContext('2d');
+  const W=320, H=420;
+  canvas.width=W; canvas.height=H;
+
+  // Fondo blanco con borde redondeado simulado
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,W,H);
+
+  // Cabecera azul
+  const grad = ctx.createLinearGradient(0,0,W,60);
+  grad.addColorStop(0,'#0ea5e9'); grad.addColorStop(1,'#0284c7');
+  ctx.fillStyle = grad; ctx.fillRect(0,0,W,62);
+
+  // Logo / tipo texto en cabecera
+  const icons={area:'🏢',maquina:'⚙️',proceso:'🔄',vehiculo:'🚗',extintor:'🔴',ruta:'🚪',custom:'📋'};
+  ctx.font = 'bold 14px Arial'; ctx.fillStyle='#ffffff'; ctx.textAlign='center';
+  ctx.fillText('SG-SST · Inspección de Seguridad', W/2, 22);
+  ctx.font = '12px Arial'; ctx.fillStyle='rgba(255,255,255,.85)';
+  ctx.fillText('Res. 0312/2019 · ISO 9001:2015', W/2, 42);
+
+  let currentY = 70;
+
+  // Foto de la máquina/área (si existe)
+  if(qrPhotoDataURL) {
+    const photoImg = new Image();
+    photoImg.onload = () => {
+      // Dibujar foto con marco redondeado
+      const px=20, py=currentY, pw=W-40, ph=110;
+      ctx.save();
+      ctx.beginPath(); ctx.roundRect(px,py,pw,ph,8); ctx.clip();
+      ctx.drawImage(photoImg, px, py, pw, ph);
+      ctx.restore();
+      // Overlay degradado en la foto
+      const ovGrad = ctx.createLinearGradient(0,py+60,0,py+ph);
+      ovGrad.addColorStop(0,'rgba(0,0,0,0)'); ovGrad.addColorStop(1,'rgba(0,0,0,0.45)');
+      ctx.save(); ctx.beginPath(); ctx.roundRect(px,py,pw,ph,8); ctx.clip();
+      ctx.fillStyle=ovGrad; ctx.fillRect(px,py,pw,ph);
+      ctx.restore();
+      drawQRCardBottom(ctx, qrImg, nombre, info, tipo, url, W, currentY+118);
+    };
+    photoImg.src = qrPhotoDataURL;
+  } else {
+    // Sin foto: rectángulo de placeholder con ícono
+    ctx.fillStyle='#f0f9ff'; ctx.fillRect(20,currentY,W-40,90);
+    ctx.strokeStyle='#bae6fd'; ctx.lineWidth=1.5;
+    ctx.strokeRect(20,currentY,W-40,90);
+    ctx.font='32px Arial'; ctx.textAlign='center';
+    ctx.fillText(icons[tipo]||'📋', W/2, currentY+54);
+    ctx.font='11px Arial'; ctx.fillStyle='#94a3b8'; ctx.textAlign='center';
+    ctx.fillText('Sin foto adjunta', W/2, currentY+80);
+    drawQRCardBottom(ctx, qrImg, nombre, info, tipo, url, W, currentY+98);
+  }
+}
+
+function drawQRCardBottom(ctx, qrImg, nombre, info, tipo, url, W, yStart) {
+  let y = yStart + 10;
+
+  // Nombre
+  ctx.fillStyle='#0c1a2e'; ctx.font='bold 16px Arial'; ctx.textAlign='center';
+  const maxW = W-32;
+  wrapText(ctx, nombre, W/2, y, maxW, 20);
+  y += nombre.length>30 ? 46 : 26;
+
+  // Info
+  if(info) {
+    ctx.font='12px Arial'; ctx.fillStyle='#64748b'; ctx.textAlign='center';
+    ctx.fillText(info.substring(0,50), W/2, y); y+=20;
+  }
+
+  // Separador
+  ctx.strokeStyle='#e0f2fe'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(20,y); ctx.lineTo(W-20,y); ctx.stroke();
+  y += 12;
+
+  // QR code centrado
+  const qrSize = 160;
+  const qrX = (W - qrSize) / 2;
+  ctx.drawImage(qrImg, qrX, y, qrSize, qrSize);
+  y += qrSize + 10;
+
+  // Instrucción
+  ctx.font='bold 11px Arial'; ctx.fillStyle='#0284c7'; ctx.textAlign='center';
+  ctx.fillText('📱 Escanea con la cámara del celular', W/2, y); y+=16;
+  ctx.font='9px Arial'; ctx.fillStyle='#94a3b8';
+  ctx.fillText('para abrir el formulario de inspección', W/2, y); y+=13;
+
+  // URL corta
+  const shortUrl = url.replace('https://','').substring(0,42);
+  ctx.font='8px Arial'; ctx.fillStyle='#bae6fd'; ctx.fillText(shortUrl, W/2, y); y+=14;
+
+  // Footer
+  ctx.fillStyle='#f0f9ff'; ctx.fillRect(0, W*420/320-30, W, 30); // pequeño footer
+  ctx.fillStyle='#0284c7'; ctx.font='bold 9px Arial'; ctx.textAlign='center';
+  ctx.fillText('SG-SST · FO-THU-30 · Coordinación Seguridad y Salud en el Trabajo', W/2, 413);
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+  const words = text.split(' '); let line = '';
+  for(let n=0; n<words.length; n++){
+    const testLine = line + words[n] + ' ';
+    if(ctx.measureText(testLine).width > maxWidth && n>0){
+      ctx.fillText(line, x, y); line = words[n]+' '; y += lineHeight;
+    } else { line = testLine; }
+  }
+  ctx.fillText(line, x, y);
+}
+
+function downloadQR(){
+  const canvas = document.getElementById('qrPrintCanvas');
+  const label  = document.getElementById('qr-nombre').value || 'QR';
+  const a = document.createElement('a');
+  a.download = `QR_SGSST_${label.replace(/\s/g,'_')}.png`;
+  a.href = canvas.toDataURL('image/png'); a.click();
+  toast('⬇️','QR Descargado','Listo para imprimir y pegar en el área/máquina');
+}
+
+function printQR(){
+  const canvas = document.getElementById('qrPrintCanvas');
+  const label  = document.getElementById('qr-nombre').value || '';
+  const dataURL = canvas.toDataURL('image/png');
+  const w = window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head>
+    <meta charset="UTF-8">
+    <style>
+      body{margin:0;padding:20px;background:#fff;display:flex;justify-content:center;}
+      img{max-width:320px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.15);}
+      @media print{body{padding:0;}img{max-width:280px;}@page{margin:5mm}}
+    </style></head><body>
+    <img src="${dataURL}" alt="QR ${label}">
+    <script>setTimeout(()=>{window.focus();window.print();},600);<\/script>
+  </body></html>`);
+}
+
+// ════════ MODALS ════════
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+
+// ════════ TOAST ════════
+let _tt;
+function toast(icon,title,sub){
+  clearTimeout(_tt);
+  document.getElementById('toastIcon').textContent=icon;
+  document.getElementById('toastTitle').textContent=title;
+  document.getElementById('toastSub').textContent=sub;
+  const t=document.getElementById('toast');t.classList.add('show');
+  _tt=setTimeout(()=>t.classList.remove('show'),3200);
+}
+</script>
+</body>
+</html>
